@@ -1,0 +1,31 @@
+.primary-gradient {
+    background: linear-gradient(133.03deg, #2B51C5 54.22%, #678CF9 80.68%);
+}
+
+.sidebar-title {
+    font-family: 'Inter', system-ui;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 48px;
+}
+
+.sidebar-subtitle {
+    font-family: 'Inter', system-ui;
+font-style: normal;
+font-weight: 600;
+font-size: 32px;
+line-height: 39px;
+}
+
+#body {
+    @apply h-full w-full
+}
+
+.router-hidden {
+    display: none;
+}
+
+#router-page-wrapper {
+    height: 100%; width: 100%
+}

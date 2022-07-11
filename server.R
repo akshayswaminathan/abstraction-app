@@ -1,21 +1,27 @@
+router <- require.r('./router.R')$router
+library(rlist)
+components <- require.r('./components.R')
+server <- function(input, output, session) {
+  router$server(input, output, session)
 
-server <- function(input, output) {
-
-  output$selected_var <- renderTable({
-    if (!isTruthy(input$fileContent)){
-      list()
+  patients <- list(list(id="1", charts=list("Hello", "World")),
+                   list(id="2", charts=list("Goodnight", "Moon")))
+  selectedPatient <- reactive({
+    a <- list.find(patients, id == get_query_param('patient_id'), 1)
+    if (length(a) == 0){
+      NULL
     }
     else {
-      datums = str_split(input$fileContent, ",")[[1]]
-    if (isTruthy(input$searchString)){
-          str_subset(datums, regex( input$searchString, ignore_case = TRUE))
+      a[[1]]
     }
-    else {
-      datums
-    }}
-
+  })
+  output$patientList <- renderUI({
+    components$patientsList(patients, selectedId = selectedPatient()$id)
   })
 
+  output$body <- renderUI({
+    components$patientView(selectedPatient())
+  })
 }
 
-exports$server = server
+exports$server <- server
