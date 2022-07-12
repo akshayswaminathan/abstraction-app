@@ -15,12 +15,13 @@ server <- function(input, output, session) {
       a[[1]]
     }
   })
+  selectedChart <- reactive({get_query_param('page')})
   output$patientList <- renderUI({
     components$patientsList(patients, selectedId = selectedPatient()$id)
   })
 
   output$body <- renderUI({
-    components$patientView(selectedPatient())
+    components$patientView(selectedPatient(), selectedChart())
   })
 }
 

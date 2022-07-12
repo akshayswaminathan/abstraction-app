@@ -9,7 +9,7 @@ exports$monogram <- monogram <- function(id){
 }
 
 exports$patientListItem <- patientListItem <- function(patient, selected = FALSE){
-  a(class=paste("block p-[10px] rounded flex flex-row gap-[10px]", ifelse(selected, "bg-grey-200", "hover:bg-grey-200/50")), href=route_link(paste0('patient?patient_id=',patient$id, '&page=0')),
+  a(class=paste("block p-[10px] rounded flex flex-row gap-[10px]", ifelse(selected, "bg-grey-200", "hover:bg-grey-200/50")), href=route_link(paste0('patient?patient_id=',patient$id, '&page=1')),
     monogram(patient$id),
     div(class="flex flex-col gap-[5px] w-full",
         span(class="font-medium text-monogram",paste("Patient", patient$id)),
@@ -28,8 +28,9 @@ exports$patientsList <- patientsList <- function(patients, selectedId = NULL){
   ))
 }
 
-chartTab <- function(chart, selected){
-  div(class="pl-4 pr-3",
+chartTab <- function(chart, idx, selected, patient){
+  a(class="pl-4 pr-3",
+    href=route_link(paste0('patient?patient_id=',patient$id, '&page=', idx)),
       style=paste("display: flex;
        flex-direction: row;
        flex-shrink: 0;
@@ -47,21 +48,21 @@ chartTab <- function(chart, selected){
             display: block"))
 }
 
-exports$chartTabs <- chartTabs <- function(charts, selected=1){
+exports$chartTabs <- chartTabs <- function(charts, selected=1, patient){
   do.call(div, c(
     class="flex flex-col divide-y-2 divide-grey-200  h-full",
     style="display: flex; flex-direction: column; min-width: 60px;",
     purrr::imap(charts, function(chart, pos){
-      chartTab(chart, pos==selected)
+      chartTab(chart, pos, pos==selected, patient)
     })
   ))
 }
 
-exports$patientView <- function(patient){
+exports$patientView <- function(patient, selChart){
   div(class="flex flex-col h-full divide-y-2 divide-grey-200",
     div(class="flex flex-row font-semibold py-3 px-6 bg-white text-bodyTitle", paste("Patient", patient$id)),
     div(class="flex flex-row divide-x-2 divide-grey-200 h-full relative",
-      chartTabs(patient$charts),
+      chartTabs(patient$charts, selChart, patient),
       div(class="flex flex-row w-full divide-x-2 divide-grey-200",
           div(class="flex flex-col grow w-full px-40 pt-8",
               div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row",
