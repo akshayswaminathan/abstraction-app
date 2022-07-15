@@ -10,9 +10,17 @@ ui <- div(class = "bg-grey-100 divide-x-2 divide-grey-200 flex flex-row h-screen
             # This one adds extra colors
             tailwindConfig = "tailwind.config.js"
           ),
-          div(class="w-[300px] bg-white flex flex-col px-7 pt-12 gap-8",
+          div(class="w-[300px] h-full overflow-x-auto shrink-0 bg-white flex flex-col px-7 pt-12 gap-8",
               h1(class="sidebar-title", "UDP App"),
-                  components$settingsButton,
+              fileInput(
+  'file',
+  'Upload CSV',
+  multiple = TRUE,
+  accept = '.csv',
+  width = NULL,
+  buttonLabel = "Browse...",
+  placeholder = "No file selected"
+),               components$settingsButton,
                   h2(class="sidebar-subtitle", "Patients"),
                 uiOutput('patientList')
 
