@@ -29,3 +29,56 @@ line-height: 39px;
 #router-page-wrapper {
     height: 100%; width: 100%
 }
+
+.tooltip {
+    @apply relative;
+}
+
+.tooltip::before {
+
+  @apply text-mini;
+  content: attr(data-tooltip);
+  position:absolute;
+
+  top:50%;
+  transform:translateY(-50%);
+
+  left:100%;
+  margin-left:10px;
+
+  width: max-content; /* 200px;*/
+  padding: 8px 12px;
+  border-radius:10px;
+  background:#000;
+  color: #fff;
+  text-align:center;
+  display:none;
+
+}
+
+.tooltip::after {
+  content: "";
+  position:absolute;
+
+  /* position tooltip correctly */
+  left:100%;
+  margin-left:-5px;
+
+  /* vertically center */
+  top:50%;
+  transform:translateY(-50%);
+
+  /* the arrow */
+  border: 8px solid #00000088;
+  border-color: transparent #00000088 transparent transparent;
+
+  display:none;
+}
+.tooltip:hover:before, .tooltip:hover:after {
+  display:block;
+}
+
+.tooltip:hover:before {
+  display:block;
+    opacity: 50%;
+}

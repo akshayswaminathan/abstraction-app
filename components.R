@@ -1,4 +1,5 @@
-exports$settingsButton <- div(class="w-full bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center",
+exports$settingsButton <- a(class="w-full bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center",
+                            href=route_link("settings"),
                       rheroicons::rheroicon(name = "cog", type = "solid", class="w-6 h-6"),
                       span(class="w-full", "Settings")
 )
@@ -9,7 +10,7 @@ exports$monogram <- monogram <- function(id){
 }
 
 exports$patientListItem <- patientListItem <- function(patient, selected = FALSE){
-  a(class=paste("block p-[10px] rounded flex flex-row gap-[10px]", ifelse(selected, "bg-grey-200", "hover:bg-grey-200/50")), href=route_link(paste0('patient?patient_id=',patient$id, '&chart_group=1')),
+  a(class=paste("block p-[10px] rounded flex flex-row gap-[10px]", ifelse(selected, "bg-grey-200", "hover:bg-grey-200/50")), href=route_link(paste0('patient?patient_id=',patient$id)),
     monogram(patient$id),
     div(class="flex flex-col gap-[5px] w-full",
         span(class="font-medium text-monogram",paste("Patient", patient$id)),
@@ -21,7 +22,7 @@ exports$patientListItem <- patientListItem <- function(patient, selected = FALSE
 
 exports$patientsList <- patientsList <- function(patients, selectedId = NULL){
   do.call(div, c(
-    class="rounded bg-grey-100 flex flex-col gap-[5px] p-[5px]",
+    class="rounded bg-grey-100 flex flex-col gap-[5px] p-[5px] overflow-y-auto h-full",
     unname(purrr::imap(patients, function(p, pIndex){
       patientListItem(p, selected= selectedId == pIndex)
     }))
@@ -30,7 +31,7 @@ exports$patientsList <- patientsList <- function(patients, selectedId = NULL){
 
 chartTab <- function(chart, idx, selected, patient){
   a(class="pl-4 pr-3",
-    href=route_link(paste0('patient?patient_id=',patient$id, '&page=', idx)),
+    href=route_link(paste0('patient?patient_id=',patient$id, '&chart_group=', idx)),
       style=paste("display: flex;
        flex-direction: row;
        flex-shrink: 0;
@@ -48,51 +49,132 @@ chartTab <- function(chart, idx, selected, patient){
             display: block"))
 }
 
-chartTabs <- function(charts, selected=1, patient){
+chartTabs <- function(charts, selected.tab=NULL, patient){
   do.call(div, c(
-    class="flex flex-col divide-y-2 divide-grey-200  h-full",
+    class="flex flex-col divide-y-2 divide-grey-200 h-full",
     style="display: flex; flex-direction: column; min-width: 60px;",
     unname(purrr::imap(charts, function(chart, pos){
-      chartTab(pos, pos, pos==selected, patient)
+    selected <- {
+        if (is.null(selected.tab)) {
+          FALSE
+        }
+        else {
+          pos==selected.tab
+        }
+    }
+    chartTab(pos, pos, selected, patient)
     }))
   ))
 }
 
 
 
-chartListItem <-  function(chart){
-  a(class="flex flex-row gap-2 rounded hover:bg-grey-200 cursor-pointer p-2",
-    div(class="w-12 h-16 shadow bg-white rounded shrink-0 my-auto"),
-    div(class="flex flex-col",
-        span(class="font-bold", chart$Title), span(class="line-clamp-2 text-muted font-light", chart$Text))
-  )
-}
 
-searchSpace <- function(chart.group){
-  str(chart.group)
+ searchSpace <- function(patient, chart.group){
   div(class="flex flex-col grow w-full lg:px-32 md:px-16 px-8 pt-8",
       div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row",
           rheroicon("search", class = "w-5 h-5 my-auto"),
-          tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal", placeholder="Search charts...")
+          tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal",
+                     placeholder="Search charts...",
+                     oninput="Shiny.setInputValue('patientSearchString', this.value);"
+          ),
+          tags$script("Shiny.setInputValue('patientSearchString', '');")
       ),
-      do.call(div,c(class="flex flex-col gap-2 mt-5",
-                    purrr::map(chart.group, chartListItem)
-          ))
+      uiOutput('searchSpaceRender')
   )
 }
 
-exports$patientView <- function(patient, selChart){
+exports$searchSpace <- function(patient, chart.group){
+  chartListItem <-  function(chart){
+    a(class="flex flex-row gap-2 rounded hover:bg-grey-200 cursor-pointer p-2",
+      href=route_link(paste0("patient?patient_id=", patient$id, "&chart_group=", chart$Category, "&chart_id=", chart$Chart.ID)),
+    div(class="w-12 h-16 shadow bg-white rounded shrink-0 my-auto"),
+      div(class="flex flex-col",
+        span(class="font-medium text-sidebarHeader", chart$Title), hr(class="h-1 border-muted"), span(class="line-clamp-3 text-muted font-light", chart$Text))
+    )
+  }
+  do.call(div,c(class="flex flex-col gap-2 mt-5 overflow-y-auto pb-5",
+                    purrr::map(chart.group, chartListItem)
+          ))
+
+}
+
+
+recordDataSidebar <- function(){
+  div(class = "flex flex-col shrink-0 py-4 px-6 w-[300px]",
+              h3(class = "text-sidebarHeader font-semibold", "Record Data")
+          )
+}
+
+patientSearchView <- function(patient, selChart.group){
+      if (is.null(selChart.group)) {
+        div(class="flex text-sidebarHeader font-bold w-full h-full", span(class="mx-auto my-auto","Please select a chart group"))
+      }
+      else {
+        div(class = "flex flex-row w-full divide-x-2 divide-grey-200",
+          searchSpace(patient, patient$chartGroups[[selChart.group]]),
+
+      )
+      }
+    }
+
+chartSearchView <- function(chart.group, chart.id){
+  chart <- Filter(function(x){x$Chart.ID == chart.id}, chart.group)[[1]]
+  div( class="px-36 flex flex-col py-8 gap-2 grow h-full",
+       div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row mb-4",
+          rheroicon("search", class = "w-5 h-5 my-auto"),
+          tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal", placeholder="Search chart...",
+                     oninput="window.markInstance && window.markInstance.unmark()[window.useRegex? 'markRegExp':'mark'](window.useRegex? new RegExp(this.value, 'i') : this.value)"),
+           tags$button(
+             `data-tooltip`="Regular Expression",
+             class="cursor-pointer hover:text-white tooltip",
+             onclick="window.useRegex = !window.useRegex; this.classList.toggle('text-primary', window.useRegex); this.classList.toggle('hover:text-white', !window.useRegex)",
+             rheroicon("flag", "solid")
+           ),
+      ),
+       div(id="mark-target",class="rounded px-6 py-4 bg-white grow overflow-y-auto", chart$Text),
+       tags$script("window.markInstance = new Mark('#mark-target');"),
+       div(class="flex flex-row",
+           div(class="flex",
+            div(class="rounded-full p-2 bg-primary my-auto mx-auto text-white",
+                rheroicon("chevron_left", "solid", class="h-8 w-8 stroke-2")
+            )
+           ),
+           div(class="grow flex flex-col pt-4 pb-2 gap-3 text-center",
+            span(class="font-medium", chart$Title),
+               span(class="text-muted","5 matches")
+           ),
+            div(class="flex",
+            div(class="rounded-full p-2 bg-primary my-auto mx-auto text-white",
+                rheroicon("chevron_right", "solid", class="h-8 w-8 stroke-2")
+            )
+           ),
+           ),
+       div(class="flex flex-row justify-center gap-6",
+           div(class="h-16 w-12 rounded bg-white shadow hover:shadow-lg hover:scale-125 duration-300 cursor-pointer transition-all"),
+           div(class="h-16 w-12 scale-110 rounded bg-white shadow-md hover:shadow-lg hover:scale-125 duration-300 cursor-pointer transition-all"),
+           div(class="h-16 w-12 rounded bg-white shadow hover:shadow-lg  hover:scale-125 duration-300 cursor-pointer transition-all")
+           )
+
+       )
+}
+
+exports$patientView <- function(patient, selChart.group, selChart){
   div(class="flex flex-col h-full divide-y-2 divide-grey-200",
     div(class="flex flex-row font-semibold py-3 px-6 bg-white text-bodyTitle", paste("Patient", patient$id)),
-    div(class="flex flex-row divide-x-2 divide-grey-200 h-full relative",
-      chartTabs(patient$chartGroups, selChart, patient),
-      div(class="flex flex-row w-full divide-x-2 divide-grey-200",
-          searchSpace(patient$chartGroups[[selChart]]),
-          div(class="flex flex-col shrink-0 py-4 px-6 w-[300px]",
-              h3(class="text-sidebarHeader font-semibold","Record Data")
-            )
-          )
-  )
+    div(class="flex flex-row divide-x-2 divide-grey-200 h-[calc(100%_-_53px)]",
+      chartTabs(patient$chartGroups, selChart.group, patient),
+        {
+          if (is.null(selChart)){
+            patientSearchView(patient, selChart.group)
+          }
+          else {
+            chartSearchView(patient$chartGroups[[selChart.group]], selChart)
+          }
+        },
+      recordDataSidebar()
+
+    )
   )
 
 

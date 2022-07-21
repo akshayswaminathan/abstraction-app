@@ -5,6 +5,7 @@ library(stringr)
 library(purrr)
 library(commonr)
 library(rheroicons)
+library(marker)
 options(shiny.autoreload = TRUE, shiny.port=3300)
 print(getOption("shiny.autoreload"))
 server <- require.r('./server.R')$server

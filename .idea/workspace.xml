@@ -2,18 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="adf8d08d-9cda-48e5-8b32-647d76519ff1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/abstraction-app.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/rAvailablePackageCache.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/rGraphicsSettings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/rSettings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/rpackages.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/App.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/fileInput.R" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/rAvailablePackageCache.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/rAvailablePackageCache.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.R" beforeDir="false" afterPath="$PROJECT_DIR$/app.R" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components.R" beforeDir="false" afterPath="$PROJECT_DIR$/components.R" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/custom.css" beforeDir="false" afterPath="$PROJECT_DIR$/custom.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/router.R" beforeDir="false" afterPath="$PROJECT_DIR$/router.R" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.R" beforeDir="false" afterPath="$PROJECT_DIR$/server.R" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ui.R" beforeDir="false" afterPath="$PROJECT_DIR$/ui.R" afterDir="false" />
     </list>
@@ -21,6 +16,13 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="R Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -40,7 +42,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   },
   "keyToStringList": {
     "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
@@ -102,6 +104,7 @@
       <workItem from="1657585140176" duration="623000" />
       <workItem from="1657585779160" duration="4115000" />
       <workItem from="1657743079415" duration="22795000" />
+      <workItem from="1658262842354" duration="20829000" />
     </task>
     <servers />
   </component>
