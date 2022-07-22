@@ -1,4 +1,7 @@
 library(dplyr)
+
+# convert the df of files to a list representation that is easy to render in shiny
+
 filesToList <- function (...){
   # accepts a list of lists, with each of the structure { name: String, data: DataFrame }
   files <- list(...)

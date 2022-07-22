@@ -52,7 +52,28 @@ server <- function(input, output, session) {
     }
   })
 
+  recordDataList <- list(
+    list(name="Value One", type="boolean"),
+    list(name="Value Two", type="number")
+  )
+
+  output$recordDataSidebar <- renderUI({
+    do.call(div,
+            c(class="flex flex-col gap-4 mt-4",
+              purrr::map(recordDataList,
+                         function(value.definition){
+                           div(class="flex flex-row justify-center gap-2",
+                               span(class="font-medium mr-auto my-auto", value.definition$name),
+                               switch(value.definition$type,
+                                      boolean=components$switchInput(), number=components$numberInput(),
+                                      text=tags$input(class="rounded bg-grey-200"))
+                           )
+                         })
+            ))
+  })
+
   output$settingsBody <- renderUI({
+    div(class="flex flex-col",
     fileInput(
       'file',
       '',
@@ -61,6 +82,11 @@ server <- function(input, output, session) {
       width = NULL,
       buttonLabel = "Browse...",
       placeholder = "No file selected"
+    ),
+      div(class="flex flex-row divide-x-2 divide-grey-200",
+          div(), # for renaming the files
+          div(), # for inputting the input types
+      ),
     )
   })
 

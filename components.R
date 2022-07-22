@@ -67,8 +67,17 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
   ))
 }
 
+exports$switchInput <- switchInput <- function(){
+  tags$label(class="switch",
+              tags$input( type="checkbox"),
+             span(class="slider round")
+  )
+}
 
+exports$numberInput <- numberInput <- function(){
+    tags$input(type="number", class="bg-grey-200 rounded px-2 py-1 w-20 text-center")
 
+}
 
  searchSpace <- function(patient, chart.group){
   div(class="flex flex-col grow w-full lg:px-32 md:px-16 px-8 pt-8",
@@ -102,7 +111,8 @@ exports$searchSpace <- function(patient, chart.group){
 
 recordDataSidebar <- function(){
   div(class = "flex flex-col shrink-0 py-4 px-6 w-[300px]",
-              h3(class = "text-sidebarHeader font-semibold", "Record Data")
+              h3(class = "text-sidebarHeader font-semibold", "Record Data"),
+      uiOutput("recordDataSidebar")
           )
 }
 

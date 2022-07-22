@@ -82,3 +82,38 @@ line-height: 39px;
   display:block;
     opacity: 50%;
 }
+
+/* the switch */
+
+.switch {
+  @apply relative inline-block w-16 h-8 bg-grey-200 rounded-full;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  @apply opacity-0 w-0 h-0;
+}
+
+/* The slider */
+.slider {
+  @apply rounded-full absolute inset-0 cursor-pointer duration-200 transition-all;
+}
+
+.slider:before {
+  @apply h-6 w-6 absolute content-[''] left-1 bottom-1 transition-all duration-200 bg-white;
+}
+
+input:checked + .slider {
+  @apply bg-primary;
+}
+
+
+input:checked + .slider:before {
+  @apply translate-x-8;
+}
+
+/* Rounded sliders */
+
+.slider.round:before {
+  border-radius: 50%;
+}
