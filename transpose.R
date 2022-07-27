@@ -3,10 +3,12 @@ library(dplyr)
 # convert the df of files to a list representation that is easy to render in shiny
 
 filesToList <- function (...){
-  # accepts a list of lists, with each of the structure { name: String, data: DataFrame }
+  # accepts a list of lists, with each of the structure { name: String, data: DataFrame, record: list(name, type) }
   files <- list(...)
   files <- purrr::map(files, function(file){
-    mutate(file$data, Category=file$name)
+    args <- list(.data=file$data, Category=file$name)
+    args[[file$record$name]] = file$record$type;
+    do.call(mutate, args)
   })
   # str(files[1])
   master.df <- do.call(rbind, files)

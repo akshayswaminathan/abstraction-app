@@ -4,9 +4,10 @@
     <list default="true" id="adf8d08d-9cda-48e5-8b32-647d76519ff1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components.R" beforeDir="false" afterPath="$PROJECT_DIR$/components.R" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/custom.css" beforeDir="false" afterPath="$PROJECT_DIR$/custom.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/router.R" beforeDir="false" afterPath="$PROJECT_DIR$/router.R" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.R" beforeDir="false" afterPath="$PROJECT_DIR$/server.R" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/transpose.R" beforeDir="false" afterPath="$PROJECT_DIR$/transpose.R" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ui.R" beforeDir="false" afterPath="$PROJECT_DIR$/ui.R" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,21 +32,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "Python"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;Python&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="R.App">
     <configuration name="scratch" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="abstraction-app" />
@@ -100,7 +101,12 @@
       <workItem from="1657585140176" duration="623000" />
       <workItem from="1657585779160" duration="4115000" />
       <workItem from="1657743079415" duration="22795000" />
-      <workItem from="1658262842354" duration="24799000" />
+      <workItem from="1658262842354" duration="25584000" />
+      <workItem from="1658509123050" duration="752000" />
+      <workItem from="1658700823781" duration="2974000" />
+      <workItem from="1658853810778" duration="12233000" />
+      <workItem from="1658881932112" duration="450000" />
+      <workItem from="1658940773363" duration="4734000" />
     </task>
     <servers />
   </component>

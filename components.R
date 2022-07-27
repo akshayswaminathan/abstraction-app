@@ -1,7 +1,7 @@
-exports$settingsButton <- a(class="w-full bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center",
-                            href=route_link("settings"),
+exports$settingsButton <- a(class="w-full my-2 bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center",
+                            href=route_link("/"),
                       rheroicons::rheroicon(name = "cog", type = "solid", class="w-6 h-6"),
-                      span(class="w-full", "Settings")
+                      span(class="w-full", "Configure")
 )
 
 exports$monogram <- monogram <- function(id){
@@ -67,9 +67,9 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
   ))
 }
 
-exports$switchInput <- switchInput <- function(){
+exports$switchInput <- switchInput <- function(oninput=""){
   tags$label(class="switch",
-              tags$input( type="checkbox"),
+              tags$input( type="checkbox", oninput=oninput),
              span(class="slider round")
   )
 }
@@ -95,9 +95,9 @@ exports$numberInput <- numberInput <- function(){
 
 exports$searchSpace <- function(patient, chart.group){
   chartListItem <-  function(chart){
-    a(class="flex flex-row gap-2 rounded hover:bg-grey-200 cursor-pointer p-2",
+    a(class="flex flex-row gap-4 rounded hover:bg-grey-200/50 cursor-pointer p-2",
       href=route_link(paste0("patient?patient_id=", patient$id, "&chart_group=", chart$Category, "&chart_id=", chart$Chart.ID)),
-    div(class="w-12 h-16 shadow bg-white rounded shrink-0 my-auto"),
+    div(class="w-20 h-24 shadow bg-white rounded shrink-0 my-auto"),
       div(class="flex flex-col",
         span(class="font-medium text-sidebarHeader", chart$Title), hr(class="h-1 border-muted"), span(class="line-clamp-3 text-muted font-light", chart$Text))
     )
@@ -112,7 +112,8 @@ exports$searchSpace <- function(patient, chart.group){
 recordDataSidebar <- function(){
   div(class = "flex flex-col shrink-0 py-4 px-6 w-[300px]",
               h3(class = "text-sidebarHeader font-semibold", "Record Data"),
-      uiOutput("recordDataSidebar")
+      uiOutput("recordDataSidebar"),
+      uiOutput("flagChartSidebar")
           )
 }
 
