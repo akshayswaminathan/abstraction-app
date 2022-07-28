@@ -4,6 +4,13 @@ exports$settingsButton <- a(class="w-full my-2 bg-grey-100 flex flex-row gap-3 p
                       span(class="w-full", "Configure")
 )
 
+exports$exportButton <- function(download.url){
+  a(class="w-full my-2 bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center",
+                            href=download.url,
+                      rheroicons::rheroicon(name = "folder_download", type = "solid", class="w-6 h-6"),
+                      span(class="w-full", "Export"))
+}
+
 exports$monogram <- monogram <- function(id){
   div(class="h-8 w-8 shrink-0 flex flex-col primary-gradient rounded-full",
       span(class="block mx-auto my-auto text-monogram text-center font-semibold text-white",id))
@@ -111,8 +118,9 @@ exports$searchSpace <- function(patient, chart.group){
 
 recordDataSidebar <- function(){
   div(class = "flex flex-col shrink-0 py-4 px-6 w-[300px]",
-              h3(class = "text-sidebarHeader font-semibold", "Record Data"),
+      h3(class = "text-sidebarHeader font-semibold", "Record Data"),
       uiOutput("recordDataSidebar"),
+      h3(class="font-semibold text-sidebarHeader mt-5 mb-3", "Flag Chart"),
       uiOutput("flagChartSidebar")
           )
 }

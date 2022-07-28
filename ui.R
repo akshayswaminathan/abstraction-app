@@ -16,6 +16,7 @@ ui <- div(class = "bg-grey-100 divide-x-2 divide-grey-200 flex flex-row h-screen
               h1(class="sidebar-title", "UDP App"),
 
               components$settingsButton,
+              components$exportButton(""),
               h2(class="sidebar-subtitle mt-2", "Patients"),
               uiOutput('patientList', class="overflow-y-auto pb-5")
 

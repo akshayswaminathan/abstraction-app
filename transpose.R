@@ -7,7 +7,7 @@ filesToList <- function (...){
   files <- list(...)
   files <- purrr::map(files, function(file){
     args <- list(.data=file$data, Category=file$name)
-    args[[file$record$name]] = file$record$type;
+    args[[file$record$name]] = file$record$type; # We probably don't need this.
     do.call(mutate, args)
   })
   # str(files[1])
