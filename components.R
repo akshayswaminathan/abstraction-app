@@ -40,8 +40,10 @@ exports$patientsList <- patientsList <- function(patients, selectedId = NULL){
   ))
 }
 
+# really should be named chartGroupTab
 chartTab <- function(chart, idx, selected, patient){
   a(class="pl-4 pr-3",
+    # use condition to display this perhaps..?
     href=route_link(paste0('patient?patient_id=',patient$id, '&chart_group=', idx)),
       style=paste("display: flex;
        flex-direction: row;
@@ -64,6 +66,7 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
   do.call(div, c(
     class="flex flex-col divide-y-2 divide-grey-200 h-full",
     style="display: flex; flex-direction: column; min-width: 60px;",
+    list(chartTab("All", "", is.null(selected.tab), patient)), # i think this works??
     unname(purrr::imap(charts, function(chart, pos){
     selected <- {
         if (is.null(selected.tab)) {
@@ -96,15 +99,22 @@ exports$txtInput <- txtInput <- function(...){
 
  searchSpace <- function(patient, chart.group){
   div(class="flex flex-col grow w-full lg:px-32 md:px-16 px-8 pt-8",
-      div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row",
+    div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row",
           rheroicon("search", class = "w-5 h-5 my-auto"),
           tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal",
                      placeholder="Search charts...",
                      oninput="Shiny.setInputValue('patientSearchString', this.value);"
           ),
-          tags$script("Shiny.setInputValue('patientSearchString', '');")
+          tags$button(
+             `data-tooltip`="Regular Expression",
+             class="cursor-pointer hover:text-white tooltip",
+             onclick="window.useRegex = !window.useRegex; Shiny.setInputValue('useRegex', window.useRegex); this.classList.toggle('text-primary', window.useRegex); this.classList.toggle('hover:text-white', !window.useRegex)",
+             rheroicon("flag", "solid")
+           ),
+          tags$script("Shiny.setInputValue('patientSearchString', '');"),
+
       ),
-      uiOutput('searchSpaceRender')
+      uiOutput('searchSpaceRender', class="h-full no-scrollbar overflow-y-auto relative")
   )
 }
 
@@ -117,7 +127,7 @@ exports$searchSpace <- function(patient, chart.group){
         span(class="font-medium text-sidebarHeader", chart$Title), hr(class="h-1 border-muted"), span(class="line-clamp-3 text-muted font-light", chart$Text))
     )
   }
-  do.call(div,c(class="flex flex-col gap-2 mt-5 overflow-y-auto pb-5",
+  do.call(div,c(class="flex flex-col gap-2 mt-5 h-full pb-5",
                     purrr::map(chart.group, chartListItem)
           ))
 
@@ -143,20 +153,25 @@ recordDataSidebar <- function(placeholder = FALSE){
 
 patientSearchView <- function(patient, selChart.group){
       if (is.null(selChart.group)) {
-        div(class="flex text-sidebarHeader font-bold w-full h-full", span(class="mx-auto my-auto","Please select a chart group"))
+        # instead of this placeholder, just display ALL of the charts.
+        #div(class="flex text-sidebarHeader font-bold w-full h-full", span(class="mx-auto my-auto","Please select a chart group"))
+        div(class = "flex flex-row w-full divide-x-2 divide-grey-200",
+          searchSpace(patient, unlist(patient$chartGroups, recursive = F, use.names = F)),
+
+        )
       }
       else {
         div(class = "flex flex-row w-full divide-x-2 divide-grey-200",
           searchSpace(patient, patient$chartGroups[[selChart.group]]),
 
-      )
+        )
       }
     }
 
 chartSearchView <- function(chart.group, chart.id){
   chart <- Filter(function(x){x$Chart.ID == chart.id}, chart.group)[[1]]
   div( class="px-36 flex flex-col py-8 gap-2 grow h-full",
-       div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row mb-4",
+  div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row mb-4",
           rheroicon("search", class = "w-5 h-5 my-auto"),
           tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal", placeholder="Search chart...",
                      oninput="window.markInstance && window.markInstance.unmark()[window.useRegex? 'markRegExp':'mark'](window.useRegex? new RegExp(this.value, 'i') : this.value)"),
@@ -165,7 +180,7 @@ chartSearchView <- function(chart.group, chart.id){
              class="cursor-pointer hover:text-white tooltip",
              onclick="window.useRegex = !window.useRegex; this.classList.toggle('text-primary', window.useRegex); this.classList.toggle('hover:text-white', !window.useRegex)",
              rheroicon("flag", "solid")
-           ),
+           )
       ),
        div(id="mark-target",class="rounded px-6 py-4 bg-white grow overflow-y-auto", chart$Text),
        tags$script("window.markInstance = new Mark('#mark-target');"),

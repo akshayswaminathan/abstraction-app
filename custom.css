@@ -117,3 +117,30 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.input-group {
+    @apply rounded-[5px] bg-grey-200 overflow-clip flex flex-row !cursor-pointer;
+}
+
+.btn {
+    cursor: pointer;
+}
+
+label.input-group-btn.input-group-prepend {
+    @apply my-auto px-2;
+}
+
+.form-control {
+    @apply outline-none ring-0 border-0;
+}
+

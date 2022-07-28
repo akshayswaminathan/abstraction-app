@@ -58,17 +58,17 @@ server <- function(input, output, session) {
   })
 
   output$recordConfiguration <- renderUI({
-    tags$form(class="flex flex-col px-8 gap-2", onchange="Shiny.setInputValue('variableName', this.variableName.value); Shiny.setInputValue('variableType', this.variableType.value)",
+    # a little bit of a delay to make it user friendly
+    tags$form(class="flex flex-col pr-8 gap-2", onblur="setTimeout(()=>{Shiny.setInputValue('variableName', this.variableName.value); Shiny.setInputValue('variableType', this.variableType.value)}, 500)",
         span(class="font-bold text-sidebarHeader mb-2", "Variable"),
-        tags$input(class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", type="text", name="variableName", placeholder="Variable Name", value=input$variableName),
+        tags$input(class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", type="text", name="variableName", placeholder="Variable Name", value=input$variableName,
         tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", name="variableType",
           tags$legend(class="px-1", "Variable Type"),
           div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "boolean"){ "yes"} else NULL}, type="radio", id="boolean", value="boolean", tags$label("Boolean", `for`="boolean", class="grow my-auto"))),
           div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "number"){"yes"} else NULL}, type="radio", id="number", value="number", tags$label("Number", `for`="number", class="grow my-auto"))),
           div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "txt"){"yes"} else NULL}, type="radio", id="txt", value="txt", tags$label("Text", `for`="txt", class="grow my-auto")))
-        ),
-        tags$button(type="submit", class="rounded bg-white px-3 py-2", "Save")
-    )
+        )
+    ))
   })
 
   recordedData <- reactiveVal(list());
@@ -170,7 +170,7 @@ server <- function(input, output, session) {
   })
 
   output$settingsBody <- renderUI({
-    div(class="flex flex-col w-full grow gap-4",
+    div(class="flex flex-col w-full grow gap-4 px-24 pt-24",
     fileInput(
       'file',
       '',
@@ -181,9 +181,9 @@ server <- function(input, output, session) {
       placeholder = "No file selected"
     ),
     div(class="flex flex-row w-full divide-x-2 divide-grey-200",
-          div(class="px-28","omg file names"), # for renaming the files
+          #div(class="px-28","omg file names"), # for renaming the files
           uiOutput("recordConfiguration"), # for inputting the input types
-          div(class="px-8 flex flex-col",
+          div(class="pl-8 flex flex-col",
             span(class="font-bold text-sidebarHeader mb-4", "Preview"),
               div(class="flex flex-row justify-center gap-2",
              span(class="font-medium mr-auto my-auto", recordingProperty()),
@@ -195,7 +195,7 @@ server <- function(input, output, session) {
           )
       ),
     div(class="flex flex-row px-28",
-      tags$button(class="ml-auto px-4 py-2 bg-primary rounded text-white", onclick="Shiny.setInputValue('dataLoadTrigger', Date.now()); console.log(`yo`)", "Load Data"))
+      tags$button(class="ml-12 px-4 py-2 bg-primary rounded text-white", onclick="Shiny.setInputValue('dataLoadTrigger', Date.now()); console.log(`yo`)", "Load Data"))
 
     )
   })
@@ -205,16 +205,24 @@ server <- function(input, output, session) {
   })
 
   chartSearchResults <- reactive({
-    charts <- selectedPatient()$chartGroups[[selectedChartGroup()]]
+    chart.group <- selectedChartGroup();
+    patient <- selectedPatient()
+    charts <- {
+      if (is.null(chart.group)) unlist(patient$chartGroups, F, F)
+      else patient$chartGroups[[chart.group]]
+    }
     searchString <- if (is.null(input$patientSearchString)) "" else input$patientSearchString;
     if (is.null(charts)){
       NULL
     }
     else {
       list.filter(
-      charts,
-      str_detect(Text, searchString)
-    )
+        charts,
+        tryCatch({ grepl(regex(searchString, ignore_case = T), Text, fixed = !input$useRegex) },
+                 error= function(cond){ grepl(regex(searchString, ignore_case = T), Text, fixed = TRUE) },
+                 warning= function(cond){ grepl(regex(searchString, ignore_case = T), Text, fixed = TRUE) }
+        )
+      )
     }
 
   })
