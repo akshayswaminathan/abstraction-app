@@ -4,11 +4,15 @@ exports$settingsButton <- a(class="w-full my-2 bg-grey-100 flex flex-row gap-3 p
                       span(class="w-full", "Configure")
 )
 
-exports$exportButton <- function(download.url){
-  a(class="w-full my-2 bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center",
-                            href=download.url,
-                      rheroicons::rheroicon(name = "folder_download", type = "solid", class="w-6 h-6"),
-                      span(class="w-full", "Export"))
+# exports$exportButton <- function(download.url){
+#   a(class="w-full my-2 bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center",
+#                             href=download.url,
+#                       rheroicons::rheroicon(name = "folder_download", type = "solid", class="w-6 h-6"),
+#                       span(class="w-full", "Export"))
+# }
+
+exports$exportButton <- function(route){
+  uiOutput("generatedData")
 }
 
 exports$monogram <- monogram <- function(id){
@@ -74,16 +78,20 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
   ))
 }
 
-exports$switchInput <- switchInput <- function(oninput=""){
+exports$switchInput <- switchInput <- function(...){
   tags$label(class="switch",
-              tags$input( type="checkbox", oninput=oninput),
+              tags$input( type="checkbox", ...),
              span(class="slider round")
   )
 }
 
-exports$numberInput <- numberInput <- function(){
-    tags$input(type="number", class="bg-grey-200 rounded px-2 py-1 w-20 text-center")
+exports$numberInput <- numberInput <- function(...){
+    tags$input(type="number", ..., class="bg-grey-200 rounded px-2 py-1 w-20 text-center outline-none ring-0 focus:outline-none border-0")
 
+}
+
+exports$txtInput <- txtInput <- function(...){
+  tags$input(class="rounded px-2 py-1 bg-grey-200 w-24", ...)
 }
 
  searchSpace <- function(patient, chart.group){
@@ -116,13 +124,21 @@ exports$searchSpace <- function(patient, chart.group){
 }
 
 
-recordDataSidebar <- function(){
-  div(class = "flex flex-col shrink-0 py-4 px-6 w-[300px]",
+recordDataSidebar <- function(placeholder = FALSE){
+  if (placeholder){
+    div(class = "flex flex-col shrink-0 py-4 px-6 w-[300px]",
+      div(class="rounded p-4 text-muted text-center bg-grey-100", "Please select a chart from the list.")
+    )
+  }
+  else {
+    div(class = "flex flex-col shrink-0 py-4 px-6 w-[300px]",
       h3(class = "text-sidebarHeader font-semibold", "Record Data"),
       uiOutput("recordDataSidebar"),
       h3(class="font-semibold text-sidebarHeader mt-5 mb-3", "Flag Chart"),
       uiOutput("flagChartSidebar")
-          )
+    )
+  }
+
 }
 
 patientSearchView <- function(patient, selChart.group){
@@ -191,7 +207,7 @@ exports$patientView <- function(patient, selChart.group, selChart){
             chartSearchView(patient$chartGroups[[selChart.group]], selChart)
           }
         },
-      recordDataSidebar()
+      recordDataSidebar(is.null(selChart))
 
     )
   )

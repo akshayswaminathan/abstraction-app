@@ -1,5 +1,6 @@
 library(rlist)
 library(dplyr)
+library(readr)
 router <- require.r('./router.R')$router
 patientRouter <- require.r('./router.R')$patientRouter
 filesToList <- require.r('./transpose.R')$filesToList
@@ -9,8 +10,12 @@ components <- require.r('./components.R')
 server <- function(input, output, session) {
   router$server(input, output, session)
   # patientRouter$server(input, output, session)
-  recordingProperty <- reactive({ input$variableName })
+  recordingProperty <- reactive({
+     if(is.null(input$variableName)){ "my property" }
+     else {input$variableName}
+  })
   recordingType <- reactive({
+    # boolean | number | txt
     if (is.null(input$variableType)){ "boolean" }
     else { input$variableType }
   })
@@ -79,12 +84,12 @@ server <- function(input, output, session) {
     div(class="flex flex-row justify-center gap-2 mt-4",
         span(class="font-medium mr-auto my-auto", recordingProperty()),
         switch(recordingType(),
-               boolean=components$switchInput(oninput="Shiny.setInputValue('recordingData', this.value === 'on'); Shiny.setInputValue('recordingTime', Date.now())"), number=components$numberInput(),
-               txt=tags$input(class="rounded px-2 py-1 bg-grey-200"))) })
+               boolean=components$switchInput(oninput="Shiny.setInputValue('recordingData', this.value === 'on'); Shiny.setInputValue('recordingTime', Date.now())"),
+               number=components$numberInput(oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', Date.now())"),
+               txt=components$txtInput(oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', Date.now())"))) })
 
   flaggedCharts <- reactiveVal(list());
   observeEvent(input$flaggingTime, {
-    # todo: redo this thing to match above
     the.data <- flaggedCharts();
     the.data[[get_query_param("chart_group")]][[get_query_param('chart_id')]] <- list(
       data=input$flagReason,
@@ -103,31 +108,65 @@ server <- function(input, output, session) {
     )
   })
 
-  generatedData <- reactive({
+  output$generatedData <- renderUI({
     # 1. obtain file data
-      file <- isolate({ input$file })
+      file <- input$file #isolate({ input$file })
+      if (is.null(file)){
+        return(NULL)
+      }
       record <- recordedData()
+      recordName <- recordingProperty()
+      recordType <- recordingType()
       flag <- flaggedCharts()
       files <- purrr::map(seq_len(nrow(as.matrix(file))), function(n) {
         # a string and a data.frame
         f <- list(name = file[n, 'name'], data = read.csv(file[n, 'datapath']))
-        f$data <- mutate(f$data, thing=FALSE, thing_date=FALSE, flag=FALSE, flag_date=FALSE)
+        defaultValue <- switch(recordType,
+          boolean=FALSE,
+          number=0,
+          txt="",
+          FALSE
+        )
+        f$data <- mutate(f$data, thing=defaultValue, thing_date=FALSE, flag=FALSE, flag_reason="", flag_date=FALSE)
+        if (!is.null(record[[f$name]])){
         for (chart.id in names(record[[f$name]])){
           chart.data <- record[[f$name]][[chart.id]]
           f$data[f$data$Chart.ID==chart.id,][['thing']] <- chart.data$data
           f$data[f$data$Chart.ID==chart.id,][['thing_date']] <- chart.data$date
         }
+        }
+        if (!is.null(flag[[f$name]])){
         for (chart.id in names(flag[[f$name]])){
           chart.data <- flag[[f$name]][[chart.id]]
-          f$data[f$data$Chart.ID==chart.id,][['flag']] <- chart.data$data
+          f$data[f$data$Chart.ID==chart.id,][['flag']] <- TRUE
+          f$data[f$data$Chart.ID==chart.id,][['flag_reason']] <- chart.data$data
           f$data[f$data$Chart.ID==chart.id,][['flag_date']] <- chart.data$date
         }
-        write.csv(f,"Path to export the DataFrame\\File Name.csv", row.names = TRUE)
+        }
+        names(f$data)[names(f$data) == 'thing'] <- recordName
+        names(f$data)[names(f$data) == 'thing_date'] <- paste0(recordName, '_date')
+        # convert to csv string
+        f$data <- format_csv(f$data)
+        f
       })
-    # 2. Convert recordedData to dataframe??
-    print("THE ACTUAL THING =======")
-    str(files)
-    NULL
+    downloadHandler(
+      filename = function() {
+        paste("output", "zip", sep=".")
+      },
+      content = function(fname) {
+        fs <- c()
+        tmpdir <- tempdir()
+        setwd(tmpdir)
+        for (f in files) {
+          path <- f$name
+          fs <- c(fs, path)
+          write(f$data, path)
+        }
+        zip(zipfile=fname, files=fs)
+      },
+      contentType = "application/zip",
+      outputArgs = list(class="w-full bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center")
+    )
   })
 
   output$settingsBody <- renderUI({
@@ -157,11 +196,11 @@ server <- function(input, output, session) {
       ),
     div(class="flex flex-row px-28",
       tags$button(class="ml-auto px-4 py-2 bg-primary rounded text-white", onclick="Shiny.setInputValue('dataLoadTrigger', Date.now()); console.log(`yo`)", "Load Data"))
+
     )
   })
 
   output$body <- renderUI({
-    generatedData()
     components$patientView(selectedPatient(), selectedChartGroup(), selectedChart())
   })
 

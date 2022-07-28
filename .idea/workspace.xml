@@ -5,8 +5,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components.R" beforeDir="false" afterPath="$PROJECT_DIR$/components.R" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.R" beforeDir="false" afterPath="$PROJECT_DIR$/server.R" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/transpose.R" beforeDir="false" afterPath="$PROJECT_DIR$/transpose.R" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ui.R" beforeDir="false" afterPath="$PROJECT_DIR$/ui.R" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +104,7 @@
       <workItem from="1658853810778" duration="12233000" />
       <workItem from="1658881932112" duration="450000" />
       <workItem from="1658940773363" duration="19297000" />
-      <workItem from="1658981826370" duration="3606000" />
+      <workItem from="1658981826370" duration="10688000" />
     </task>
     <servers />
   </component>
