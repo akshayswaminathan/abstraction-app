@@ -82,12 +82,13 @@ server <- function(input, output, session) {
     recordedData(the.data)
   })
   output$recordDataSidebar <- renderUI({
+    value <- isolate({ recordedData()})[[selectedChartGroup()]][[selectedChart()]][['data']]
     div(class="flex flex-row justify-center gap-2 mt-4",
         span(class="font-medium mr-auto my-auto", recordingProperty()),
         switch(recordingType(),
-               boolean=components$switchInput(oninput="Shiny.setInputValue('recordingData', this.value === 'on'); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
-               number=components$numberInput(oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
-               txt=components$txtInput(oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"))) })
+               boolean=components$switchInput(checked= { if (isTruthy(value)){TRUE} else NULL }, oninput="Shiny.setInputValue('recordingData', this.value === 'on'); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+               number=components$numberInput(value=value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+               txt=components$txtInput(value=value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"))) })
 
   flaggedCharts <- reactiveVal(list());
   observeEvent(input$flaggingTime, {
@@ -98,14 +99,22 @@ server <- function(input, output, session) {
     )
     flaggedCharts(the.data)
   })
-  output$flagChartSidebar <- renderUI({
-    div(class="flex flex-col",
-        tags$textarea(class="rounded bg-grey-200 outline-none ring-0 focus:outline-none border-0 px-3 py-2", placeholder="Reason", oninput="Shiny.setInputValue('flagReason', this.value)"),
-        tags$button(class="bg-[#FEA725] text-white flex flex-row px-3 py-2 ml-auto rounded mt-2",
+
+  output$flagButton <- renderUI({
+    value <- flaggedCharts()[[selectedChartGroup()]][[selectedChart()]][['data']]
+    needUpdate <- { is.null(value) || input$flagReason != value }
+    tags$button(class=paste({ if (needUpdate) "bg-[#FEA725]" else "bg-[#67D292]"}, "text-white flex flex-row px-3 py-2 ml-auto rounded mt-2 gap-2"),
             onclick="Shiny.setInputValue('flaggingTime', (new Date).toUTCString());",
-            rheroicon("flag", "solid", class="h-5 w-5 my-auto"),
-            span(class="my-auto", "Flag")
+            rheroicon(ifelse(needUpdate, "flag", "check_circle"), "solid", class="h-5 w-5 my-auto"),
+            span(class="my-auto", ifelse(needUpdate, "Flag", "Flagged"))
         )
+  })
+
+  output$flagChartSidebar <- renderUI({
+    value <- flaggedCharts()[[selectedChartGroup()]][[selectedChart()]][['data']]
+    div(class="flex flex-col",
+        tags$textarea(class="rounded bg-grey-200 outline-none ring-0 focus:outline-none border-0 px-3 py-2", placeholder="Reason", oninput="Shiny.setInputValue('flagReason', this.value)", value),
+        uiOutput('flagButton')
     )
   })
 
@@ -170,6 +179,12 @@ server <- function(input, output, session) {
     )
   })
 
+  output$chartMatches <- renderUI({
+    chart <- Filter(function(x){x$Chart.ID == selectedChart()}, selectedPatient()$chartGroups[[selectedChartGroup()]])[[1]]
+    if (is.null(input$chartSearchString)) { "No "} else matches <- str_count(chart$Text, input$chartSearchString)
+    span(class="text-muted", paste(matches, "matches"))
+  })
+
   output$settingsBody <- renderUI({
     div(class="flex flex-col w-full grow gap-4 px-24 pt-24",
     fileInput(
@@ -181,7 +196,7 @@ server <- function(input, output, session) {
       buttonLabel = "Browse...",
       placeholder = "No file selected"
     ),
-    div(class="flex flex-row w-full divide-x-2 divide-grey-200",
+    div(class="flex flex-row w-full divide-x-2 divide-grey-200 p-5 rounded bg-white focus-within:shadow-lg transition transition-all",
           #div(class="px-28","omg file names"), # for renaming the files
           uiOutput("recordConfiguration"), # for inputting the input types
           div(class="pl-8 flex flex-col",

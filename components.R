@@ -16,16 +16,16 @@ exports$exportButton <- function(route){
 }
 
 exports$monogram <- monogram <- function(id){
-  div(class="h-8 w-8 shrink-0 flex flex-col primary-gradient rounded-full",
+  div(class="h-8 w-8 shrink-0 flex flex-col primary-gradient rounded-full my-auto",
       span(class="block mx-auto my-auto text-monogram text-center font-semibold text-white",id))
 }
 
 exports$patientListItem <- patientListItem <- function(patient, selected = FALSE){
   a(class=paste("block p-[10px] rounded flex flex-row gap-[10px]", ifelse(selected, "bg-grey-200", "hover:bg-grey-200/50")), href=route_link(paste0('patient?patient_id=',patient$id)),
     monogram(patient$id),
-    div(class="flex flex-col gap-[5px] w-full",
+    div(class="flex flex-col gap-1 w-full",
         span(class="font-medium text-monogram",paste("Patient", patient$id)),
-        span(class="block text-muted break-words line-clamp-1 font-light text-mini leading-tight") #, paste0(patient$chartGroups, collapse="•"))
+        span(class="block text-muted break-words line-clamp-1 font-light text-mini leading-tight", paste(length(unlist(patient$chartGroups)), "charts"))
     ),
     rheroicon("chevron_right", "outline", class = 'w-6 h-6 my-auto shrink-0')
   )
@@ -196,7 +196,7 @@ chartSearchView <- function(chart.group, chart.id){
   div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row mb-4",
           rheroicon("search", class = "w-5 h-5 my-auto"),
           tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal", placeholder="Search chart...",
-                     oninput="window.markInstance && window.markInstance.unmark()[window.useRegex? 'markRegExp':'mark'](window.useRegex? new RegExp(this.value, 'i') : this.value)"),
+                     oninput="window.markInstance && window.markInstance.unmark()[window.useRegex? 'markRegExp':'mark'](window.useRegex? new RegExp(this.value, 'i') : this.value); Shiny.setInputValue('chartSearchString', this.value)"),
            tags$button(
              `data-tooltip`="Regular Expression",
              class="cursor-pointer hover:text-white tooltip",
@@ -215,6 +215,7 @@ chartSearchView <- function(chart.group, chart.id){
            div(class="grow flex flex-col pt-4 pb-2 gap-3 text-center",
             span(class="font-medium", chart$Title),
                span(class="text-muted","5 matches")
+               # uiOutput('chartMatches')
            ),
             div(class="flex",
             div(class="rounded-full p-2 bg-primary my-auto mx-auto text-white",

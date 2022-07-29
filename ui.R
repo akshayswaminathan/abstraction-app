@@ -13,7 +13,7 @@ ui <- div(class = "bg-grey-100 divide-x-2 divide-grey-200 flex flex-row h-screen
           ),
           tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"),
           div(class="w-[300px] h-full shrink-0 bg-white flex flex-col px-7 pt-12 gap-4",
-              h1(class="sidebar-title", "UDP App"),
+              h1(class="sidebar-title", "UDP"),
 
               components$settingsButton,
               components$exportButton(""),
