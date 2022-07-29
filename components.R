@@ -44,7 +44,7 @@ exports$patientsList <- patientsList <- function(patients, selectedId = NULL){
 chartTab <- function(chart, idx, selected, patient){
   a(class="pl-4 pr-3",
     # use condition to display this perhaps..?
-    href=route_link(paste0('patient?patient_id=',patient$id, '&chart_group=', idx)),
+    href=route_link(do.call(paste0, c(list('patient?patient_id=',patient$id), if (is.null(idx)) {list()} else list('&chart_group=', idx) ))),
       style=paste("display: flex;
        flex-direction: row;
        flex-shrink: 0;
@@ -66,7 +66,7 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
   do.call(div, c(
     class="flex flex-col divide-y-2 divide-grey-200 h-full",
     style="display: flex; flex-direction: column; min-width: 60px;",
-    list(chartTab("All", "", is.null(selected.tab), patient)), # i think this works??
+    list(chartTab("All", NULL, is.null(selected.tab), patient)), # i think this works??
     unname(purrr::imap(charts, function(chart, pos){
     selected <- {
         if (is.null(selected.tab)) {
@@ -118,19 +118,41 @@ exports$txtInput <- txtInput <- function(...){
   )
 }
 
-exports$searchSpace <- function(patient, chart.group){
+exports$searchSpace <- function(patient, chart.group.results, all=FALSE){
   chartListItem <-  function(chart){
     a(class="flex flex-row gap-4 rounded hover:bg-grey-200/50 cursor-pointer p-2",
       href=route_link(paste0("patient?patient_id=", patient$id, "&chart_group=", chart$Category, "&chart_id=", chart$Chart.ID)),
     div(class="w-20 h-24 shadow bg-white rounded shrink-0 my-auto"),
       div(class="flex flex-col",
-        span(class="font-medium text-sidebarHeader", chart$Title), hr(class="h-1 border-muted"), span(class="line-clamp-3 text-muted font-light", chart$Text))
+        span(class="font-medium text-sidebarHeader", chart$Title), span(class="line-clamp-3 text-muted font-light", chart$Text))
     )
   }
-  do.call(div,c(class="flex flex-col gap-2 mt-5 h-full pb-5",
-                    purrr::map(chart.group, chartListItem)
-          ))
-
+  # IN THE EVENT OF [ALL] TAB
+  if (all){
+    do.call(div,
+         c(class="flex flex-col gap-2 mt-5 h-full pb-5",
+              unname(purrr::imap(chart.group.results, function(result.group, group.name){
+                do.call(div,
+                  c(class="flex flex-col gap-2 mt-3", # ml-4 for indentation?
+                    list(
+                      span(class=" text-muted text-sidebarHeader uppercase", group.name ), hr(class="h-1 border-muted ")
+                    ),
+                    purrr::map(result.group, chartListItem)
+                  )
+                )
+              })
+              )
+            )
+    )
+  }
+  # NORMAL CHART TAB
+  else {
+    do.call(div,
+            c(class="flex flex-col gap-2 mt-5 h-full pb-5",
+              purrr::map(chart.group.results, chartListItem)
+            )
+    )
+  }
 }
 
 

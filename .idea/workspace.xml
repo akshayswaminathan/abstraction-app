@@ -4,7 +4,6 @@
     <list default="true" id="adf8d08d-9cda-48e5-8b32-647d76519ff1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components.R" beforeDir="false" afterPath="$PROJECT_DIR$/components.R" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/custom.css" beforeDir="false" afterPath="$PROJECT_DIR$/custom.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.R" beforeDir="false" afterPath="$PROJECT_DIR$/server.R" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -105,7 +104,7 @@
       <workItem from="1658853810778" duration="12233000" />
       <workItem from="1658881932112" duration="450000" />
       <workItem from="1658940773363" duration="19297000" />
-      <workItem from="1658981826370" duration="15822000" />
+      <workItem from="1658981826370" duration="21531000" />
     </task>
     <servers />
   </component>
