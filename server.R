@@ -1,6 +1,7 @@
 library(rlist)
 library(dplyr)
 library(readr)
+library(tidyr)
 router <- require.r('./router.R')$router
 patientRouter <- require.r('./router.R')$patientRouter
 filesToList <- require.r('./transpose.R')$filesToList
@@ -20,16 +21,51 @@ server <- function(input, output, session) {
     if (is.null(input$variableType)){ "boolean" }
     else { input$variableType }
   })
+  
   patients <- eventReactive({input$dataLoadTrigger; input$file}, {
+    file <- input$file
+    if (is.null(file) | is.null(input$dataLoadTrigger)) { 
+      NULL 
+      } else {
+        
+        raw_data <- purrr::map2(file$datapath, file$name, 
+                    ~read.csv(.x) %>% 
+                      mutate(Category = .y)) %>% 
+          setNames(file$name)
+        
+        if (!is.null(input$filterFileName) & !is.null(input$filterCode)) {
+          raw_data <- raw_data[[input$filterFileName]] %>% 
+            filter(eval(parse(text = input$filterCode)))
+        }
+        
+        raw_data %>% 
+          bind_rows() %>% 
+          group_by(Patient.Id) %>% 
+          nest() %>% 
+          mutate(new_data = map(data, ~mutate(.x, Patient.Id = Patient.Id) %>% 
+                                  as.data.frame())) %>% 
+          pull(new_data, name = Patient.Id) %>% 
+          imap(~list(id = .y, 
+                     chartGroups = purrr::map(split(.x, .x$Category), function (chart.group){
+                       purrr::map(seq_len(nrow(chart.group)),
+                                  function(row){as.list(unlist(chart.group[row,]))}
+                       )
+                     })
+          ))
+        
+    }
+  }, ignoreNULL = F)
+  
+  all_charts_df <- eventReactive({input$dataLoadTrigger; input$file}, {
     file <- input$file
     if (is.null(file) | is.null(input$dataLoadTrigger)) { NULL }
     else {
-      do.call(filesToList, purrr::map(seq_len(nrow(as.matrix(file))), function(n) {
-        f <- list(name = file[n, 'name'], data = read.csv(file[n, 'datapath']), record = list(name = recordingProperty(), type = recordingType()))
-        f
-      }))
+      all_dfs <- purrr::map(file$datapath, read.csv) %>% 
+        setNames(file$name)
     }
   }, ignoreNULL = F)
+  
+
   selectedPatient <- reactive({
     pIndex <- get_query_param('patient_id')
     if (is.null(pIndex)){
@@ -59,6 +95,8 @@ server <- function(input, output, session) {
   })
 
   output$recordConfiguration <- renderUI({
+
+    
     # a little bit of a delay to make it user friendly
     tags$form(class="flex flex-col pr-8 gap-2",
         span(class="font-bold text-sidebarHeader mb-2", "Variable"),
@@ -68,10 +106,78 @@ server <- function(input, output, session) {
           div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "boolean"){ "yes"} else NULL}, type="radio", id="boolean", value="boolean", tags$label("Boolean", `for`="boolean", class="grow my-auto"))),
           div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "number"){"yes"} else NULL}, type="radio", id="number", value="number", tags$label("Number", `for`="number", class="grow my-auto"))),
           div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "txt"){"yes"} else NULL}, type="radio", id="txt", value="txt", tags$label("Text", `for`="txt", class="grow my-auto")))
+
         )
     ))
+    
+  })
+  
+  
+  variableSelector <- reactive({
+    if (is.null(input$filterFileName)) {
+      tags$span("Select a file")
+    } else {
+      components$dropdownButton("Variables to filter", colnames(all_charts_df()[[input$filterFileName]]), "filterVariableName")
+    }
+  })
+  
+  filterCodeEntry <- reactive({
+    if (is.null(input$filterFileName)) {
+      tags$span("Select a file")
+    } else {
+      textInput("filterCode", NULL, "")    }
   })
 
+  output$settingsBody <- renderUI({
+    div(class="flex flex-col w-full grow gap-4 px-24 pt-24",
+        fileInput(
+          'file',
+          '',
+          multiple = TRUE,
+          accept = '.csv',
+          width = NULL,
+          buttonLabel = "Browse...",
+          placeholder = "No file selected"
+        ),
+        
+        div(class="flex flex-row px-28",
+            tags$button(class="ml-12 px-4 py-2 bg-primary rounded text-white", onclick="Shiny.setInputValue('dataLoadTrigger', (new Date).toUTCString()); console.log(`yo`)", "Update Data")),
+        
+        # Filtering area
+        tags$form(class="flex flex-col pr-8 gap-2",
+                  span(class="font-bold text-sidebarHeader mb-2", "Filter data"),
+                  filterCodeEntry(),
+                  variableSelector(),
+                  components$dropdownButton("File to filter", names(all_charts_df()), "filterFileName")
+                  # tags$input(onblur="Shiny.setInputValue('variableName', this.value);", class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", type="text", name="variableName", placeholder= names(all_charts_df()), value=input$variableName,
+                  #            tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", name="variableType", onchange=" Shiny.setInputValue('variableType', event.target.value);",
+                  #                          tags$legend(class="px-1", "Variable Type"),
+                  #                          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "boolean"){ "yes"} else NULL}, type="radio", id="boolean", value="boolean", tags$label("Boolean", `for`="boolean", class="grow my-auto"))),
+                  #                          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "number"){"yes"} else NULL}, type="radio", id="number", value="number", tags$label("Number", `for`="number", class="grow my-auto"))),
+                  #                          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "txt"){"yes"} else NULL}, type="radio", id="txt", value="txt", tags$label("Text", `for`="txt", class="grow my-auto")))
+                  #                          
+                  #            )
+                  # )
+                  ),
+        
+        div(class="flex flex-row w-full divide-x-2 divide-grey-200 p-5 rounded bg-white focus-within:shadow-lg transition transition-all",
+            #div(class="px-28","omg file names"), # for renaming the files
+            uiOutput("recordConfiguration"), # for inputting the input types
+            div(class="pl-8 flex flex-col",
+                span(class="font-bold text-sidebarHeader mb-4", "Preview"),
+                div(class="flex flex-row justify-center gap-2",
+                    span(class="font-medium mr-auto my-auto", recordingProperty()),
+                    switch(recordingType(),
+                           boolean=components$switchInput(),
+                           number=components$numberInput(),
+                           txt=components$txtInput())
+                )
+            )
+        )
+        
+    )
+  })
+  
   recordedData <- reactiveVal(list());
   observeEvent(input$recordingTime, {
     the.data <- recordedData()
@@ -183,37 +289,6 @@ server <- function(input, output, session) {
     chart <- Filter(function(x){x$Chart.ID == selectedChart()}, selectedPatient()$chartGroups[[selectedChartGroup()]])[[1]]
     if (is.null(input$chartSearchString)) { "No "} else matches <- str_count(chart$Text, input$chartSearchString)
     span(class="text-muted", paste(matches, "matches"))
-  })
-
-  output$settingsBody <- renderUI({
-    div(class="flex flex-col w-full grow gap-4 px-24 pt-24",
-    fileInput(
-      'file',
-      '',
-      multiple = TRUE,
-      accept = '.csv',
-      width = NULL,
-      buttonLabel = "Browse...",
-      placeholder = "No file selected"
-    ),
-    div(class="flex flex-row w-full divide-x-2 divide-grey-200 p-5 rounded bg-white focus-within:shadow-lg transition transition-all",
-          #div(class="px-28","omg file names"), # for renaming the files
-          uiOutput("recordConfiguration"), # for inputting the input types
-          div(class="pl-8 flex flex-col",
-            span(class="font-bold text-sidebarHeader mb-4", "Preview"),
-              div(class="flex flex-row justify-center gap-2",
-             span(class="font-medium mr-auto my-auto", recordingProperty()),
-             switch(recordingType(),
-              boolean=components$switchInput(),
-              number=components$numberInput(),
-              txt=components$txtInput())
-             )
-          )
-      ),
-    div(class="flex flex-row px-28",
-      tags$button(class="ml-12 px-4 py-2 bg-primary rounded text-white", onclick="Shiny.setInputValue('dataLoadTrigger', (new Date).toUTCString()); console.log(`yo`)", "Load Data"))
-
-    )
   })
 
   output$body <- renderUI({
