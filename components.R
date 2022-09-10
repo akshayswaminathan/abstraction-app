@@ -82,7 +82,7 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
 }
 
 
-exports$dropdownButton <- dropdownButton <- function(name, options, ...){
+exports$dropdownButton <- dropdownButton <- function(name, options, inputName, ...){
   div(class="text-right ml-auto",
       div(class="relative inline-block text-left",
 
@@ -97,7 +97,7 @@ exports$dropdownButton <- dropdownButton <- function(name, options, ...){
           do.call(div, c(list(class=" dropdown-content scale-0 absolute z-30 right-0 mt-2 w-56 origin-top-right rounded bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transform opacity-100  p-1"),
                     purrr::map(options,
                                function(option){
-                                 tags$button( class="cursor-pointer text-gray-900 group flex w-full items-center hover:bg-grey-200 rounded px-2 py-2 text-sidebar", option)
+                                 tags$button( class="cursor-pointer text-gray-900 group flex w-full items-center hover:bg-grey-200 rounded px-2 py-2 text-sidebar", option, onclick=paste0("Shiny.setInputValue('", inputName,"', this.innerText);", ...))
                                }
                     )
               )
@@ -129,6 +129,7 @@ exports$txtInput <- txtInput <- function(...){
           rheroicon("search", class = "w-5 h-5 my-auto"),
           tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal",
                      placeholder="Search charts...",
+                     id="patient-search-input",
                      oninput="Shiny.setInputValue('patientSearchString', this.value);"
           ),
           tags$button(
@@ -138,7 +139,7 @@ exports$txtInput <- txtInput <- function(...){
              rheroicon("flag", "solid")
            ),
         ),
-            dropdownButton("Presets", list("apple", "banana", "cantaloupe")),
+            dropdownButton("Presets", list("apple", "banana", "cantaloupe"), 'patientSearchString', "document.getElementById('patient-search-input').value = this.innerText;"),
           tags$script("Shiny.setInputValue('patientSearchString', '');"),
 
       ),
