@@ -1,3 +1,5 @@
+regex_functions <- require.r('./regex_functions.R')
+
 exports$settingsButton <- a(class="w-full my-2 bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center",
                             href=route_link("/"),
                       rheroicons::rheroicon(name = "cog", type = "solid", class="w-6 h-6"),
@@ -82,8 +84,8 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
 }
 
 
-exports$dropdownButton <- dropdownButton <- function(name, options, inputName, ...){
-      div(class="relative inline-block text-left",
+exports$dropdownButton <- dropdownButton <- function(name, options, inputName, class, ...){
+      div(class=paste("relative inline-block text-left", class),
 
 
           tags$label(class="inline-flex cursor-pointer rounded h-full w-full justify-center text-black rounded-md bg-grey-200/50 px-4 py-2  font-medium hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75",
@@ -139,7 +141,7 @@ exports$txtInput <- txtInput <- function(...){
              rheroicon("flag", "solid")
            ),
         ),
-            dropdownButton("Presets", list("apple", "banana", "considered"), 'patientSearchString', "ml-auto", "document.getElementById('patient-search-input').value = this.innerText;window.useRegex = !window.useRegex; Shiny.setInputValue('useRegex', window.useRegex); document.getElementById('regex-button').classList.toggle('text-primary', window.useRegex); document.getElementById('regex-button').classList.toggle('hover:text-white', !window.useRegex)"),
+            dropdownButton("Presets", list(regex_functions$get_n_words_before_after("", "considered", NULL, 3 ), "banana", "considered"), 'patientSearchString', "ml-auto", "document.getElementById('patient-search-input').value = this.innerText; window.useRegex = true; Shiny.setInputValue('useRegex', true); document.getElementById('regex-button').classList.toggle('text-primary', true); document.getElementById('regex-button').classList.toggle('hover:text-white', false)"),
           tags$script("Shiny.setInputValue('patientSearchString', '');"),
 
       ),
@@ -153,7 +155,7 @@ exports$searchSpace <- function(patient, chart.group.results, all=FALSE){
       href=route_link(paste0("patient?patient_id=", patient$id, "&chart_group=", chart$Category, "&chart_id=", chart$Chart.ID)),
     div(class="w-20 h-24 shadow bg-white rounded shrink-0 my-auto"),
       div(class="flex flex-col",
-        span(class="font-medium text-sidebarHeader", chart$Title), span(class="line-clamp-3 text-muted font-light", chart$Text))
+        span(class="font-medium text-sidebarHeader flex flex-row", chart$Title, span(class="text-muted ml-2", chart$Date)), span(class="line-clamp-3 text-muted font-light", chart$Text))
     )
   }
   # IN THE EVENT OF [ALL] TAB
@@ -222,16 +224,24 @@ patientSearchView <- function(patient, selChart.group){
 chartSearchView <- function(chart.group, chart.id){
   chart <- Filter(function(x){x$Chart.ID == chart.id}, chart.group)[[1]]
   div( class="px-36 flex flex-col py-8 gap-2 grow h-full",
-  div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row mb-4",
+  div(class="rounded bg-grey-200  text-muted font-light flex flex-row mb-4",
+      div(class="py-2 px-3 gap-2 grow flex flex-row",
           rheroicon("search", class = "w-5 h-5 my-auto"),
-          tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal", placeholder="Search chart...",
+          tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal",
+                     id="chart-search-input",
+                     placeholder="Search chart...",
                      oninput="window.markInstance && window.markInstance.unmark()[window.useRegex? 'markRegExp':'mark'](window.useRegex? new RegExp(this.value, 'i') : this.value); Shiny.setInputValue('chartSearchString', this.value)"),
            tags$button(
              `data-tooltip`="Regular Expression",
              class="cursor-pointer hover:text-white tooltip",
-             onclick="window.useRegex = !window.useRegex; this.classList.toggle('text-primary', window.useRegex); this.classList.toggle('hover:text-white', !window.useRegex)",
+             id="regex-button",
+             onclick="window.useRegex = !window.useRegex; Shiny.setInputValue('useRegex', window.useRegex); this.classList.toggle('text-primary', window.useRegex); this.classList.toggle('hover:text-white', !window.useRegex)",
              rheroicon("flag", "solid")
-           )
+           ),),
+
+            dropdownButton("Presets", list(regex_functions$get_n_words_before_after("", "considered", NULL, 3 ), "banana", "considered"), 'patientSearchString', "ml-auto", "document.getElementById('chart-search-input').value = this.innerText; window.useRegex = true; Shiny.setInputValue('useRegex', true); document.getElementById('regex-button').classList.toggle('text-primary', true); document.getElementById('regex-button').classList.toggle('hover:text-white', false)"),
+
+
       ),
        div(id="mark-target",class="rounded px-6 py-4 bg-white grow overflow-y-auto", chart$Text),
        tags$script("window.markInstance = new Mark('#mark-target');"),
