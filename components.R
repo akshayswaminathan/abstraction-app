@@ -81,6 +81,31 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
   ))
 }
 
+
+exports$dropdownButton <- dropdownButton <- function(name, options, ...){
+  div(class="text-right ml-auto",
+      div(class="relative inline-block text-left",
+
+
+          tags$label(class="inline-flex cursor-pointer rounded h-full w-full justify-center text-black rounded-md bg-grey-200/50 px-4 py-2  font-medium hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75",
+                     `for`="dropdown-trigger",
+                        name,
+                         rheroicons::rheroicon("chevron_down"),
+          ),
+          tags$input(class="hidden", type="checkbox", id="dropdown-trigger"),
+
+          do.call(div, c(list(class=" dropdown-content scale-0 absolute z-30 right-0 mt-2 w-56 origin-top-right rounded bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none transform opacity-100  p-1"),
+                    purrr::map(options,
+                               function(option){
+                                 tags$button( class="cursor-pointer text-gray-900 group flex w-full items-center hover:bg-grey-200 rounded px-2 py-2 text-sidebar", option)
+                               }
+                    )
+              )
+          )
+      )
+  )
+}
+
 exports$switchInput <- switchInput <- function(...){
   tags$label(class="switch",
               tags$input( type="checkbox", ...),
@@ -99,7 +124,8 @@ exports$txtInput <- txtInput <- function(...){
 
  searchSpace <- function(patient, chart.group){
   div(class="flex flex-col grow w-full lg:px-32 md:px-16 px-8 pt-8",
-    div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row",
+    div(class="rounded bg-grey-200  text-muted font-light flex flex-row",
+        div(class="py-2 px-3 gap-2 flex flex-row",
           rheroicon("search", class = "w-5 h-5 my-auto"),
           tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal",
                      placeholder="Search charts...",
@@ -111,6 +137,8 @@ exports$txtInput <- txtInput <- function(...){
              onclick="window.useRegex = !window.useRegex; Shiny.setInputValue('useRegex', window.useRegex); this.classList.toggle('text-primary', window.useRegex); this.classList.toggle('hover:text-white', !window.useRegex)",
              rheroicon("flag", "solid")
            ),
+        ),
+            dropdownButton("Presets", list("apple", "banana", "cantaloupe")),
           tags$script("Shiny.setInputValue('patientSearchString', '');"),
 
       ),

@@ -114,6 +114,11 @@ input:checked + .slider:before {
 
 /* Rounded sliders */
 
+
+input:checked + .dropdown-content {
+    @apply scale-100;
+}
+
 .slider.round:before {
   border-radius: 50%;
 }
