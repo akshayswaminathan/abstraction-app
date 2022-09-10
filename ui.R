@@ -1,11 +1,29 @@
-ui <- div(class = "bg-gray-200 flex flex-col h-screen w-screen px-10 pt-8",
-          shiny.tailwind::use_tailwind(),
-          h1(class = "text-2xl font-bold mb-5", "Test App"),
-          tags$input(type="file", oninput="this.files[0].text().then(v=>{Shiny.setInputValue(\"fileContent\", v)})", id="fileInput", accept="text/csv", class="block mb-2 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400", id="file_input"),
-          tags$input(class="rounded-md bg-white outline-none block px-2 py-1", oninput="Shiny.setInputValue(\"searchString\", this.value)"),
-          div(class="mt-2 flex flex-col"),
-          tableOutput("selected_var")
+components <- require.r('components.R')
+router <- require.r('router.R')$router
+
+ui <- div(class = "bg-grey-100 divide-x-2 divide-grey-200 flex flex-row h-screen w-screen",
+          shiny.tailwind::use_tailwind(
+            # Custom classes
+            css = paste0("./", BASE_DIR, "/custom.css"),
+            # configuration, see here: https://tailwindcss.com/docs/configuration
+            # This one adds extra colors
+            tailwindConfig = paste0("./", BASE_DIR, "/tailwind.config.js")
+          ),
+          tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"),
+          div(class="w-[300px] h-full shrink-0 bg-white flex flex-col px-7 pt-12 gap-4",
+              h1(class="sidebar-title", "UDP"),
+
+              components$settingsButton,
+              components$exportButton(""),
+              h2(class="sidebar-subtitle mt-2", "Patients"),
+              uiOutput('patientList', class="overflow-y-auto pb-5")
+
+          ),
+          div(class="w-full bg-grey-100 ",
+                router$ui
+              )
+
 )
 
 
-exports$ui <- ui
+exports$ui = ui

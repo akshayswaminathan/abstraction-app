@@ -1,0 +1,146 @@
+.primary-gradient {
+    background: linear-gradient(133.03deg, #2B51C5 54.22%, #678CF9 80.68%);
+}
+
+.sidebar-title {
+    font-family: 'Inter', system-ui;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 48px;
+}
+
+.sidebar-subtitle {
+    font-family: 'Inter', system-ui;
+font-style: normal;
+font-weight: 600;
+font-size: 32px;
+line-height: 39px;
+}
+
+#body {
+    @apply h-full w-full
+}
+
+.router-hidden {
+    display: none;
+}
+
+#router-page-wrapper {
+    height: 100%; width: 100%
+}
+
+.tooltip {
+    @apply relative;
+}
+
+.tooltip::before {
+
+  @apply text-mini;
+  content: attr(data-tooltip);
+  position:absolute;
+
+  top:50%;
+  transform:translateY(-50%);
+
+  left:100%;
+  margin-left:10px;
+
+  width: max-content; /* 200px;*/
+  padding: 8px 12px;
+  border-radius:10px;
+  background:#000;
+  color: #fff;
+  text-align:center;
+  display:none;
+
+}
+
+.tooltip::after {
+  content: "";
+  position:absolute;
+
+  /* position tooltip correctly */
+  left:100%;
+  margin-left:-5px;
+
+  /* vertically center */
+  top:50%;
+  transform:translateY(-50%);
+
+  /* the arrow */
+  border: 8px solid #00000088;
+  border-color: transparent #00000088 transparent transparent;
+
+  display:none;
+}
+.tooltip:hover:before, .tooltip:hover:after {
+  display:block;
+}
+
+.tooltip:hover:before {
+  display:block;
+    opacity: 50%;
+}
+
+/* the switch */
+
+.switch {
+  @apply relative inline-block w-16 h-8 bg-grey-200 rounded-full;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  @apply opacity-0 w-0 h-0;
+}
+
+/* The slider */
+.slider {
+  @apply rounded-full absolute inset-0 cursor-pointer duration-200 transition-all;
+}
+
+.slider:before {
+  @apply h-6 w-6 absolute content-[''] left-1 bottom-1 transition-all duration-200 bg-white;
+}
+
+input:checked + .slider {
+  @apply bg-primary;
+}
+
+
+input:checked + .slider:before {
+  @apply translate-x-8;
+}
+
+/* Rounded sliders */
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.input-group {
+    @apply rounded-[5px] bg-grey-200 overflow-clip flex flex-row !cursor-pointer;
+}
+
+.btn {
+    cursor: pointer;
+}
+
+label.input-group-btn.input-group-prepend {
+    @apply my-auto px-2;
+}
+
+.form-control {
+    @apply outline-none ring-0 border-0;
+}
+
