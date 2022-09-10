@@ -1,10 +1,10 @@
 library(rlist)
 library(dplyr)
 library(readr)
-router <- require.r('router.R')$router
-patientRouter <- require.r('router.R')$patientRouter
-filesToList <- require.r('transpose.R')$filesToList
-components <- require.r('components.R')
+router <- require.r('./router.R')$router
+patientRouter <- require.r('./router.R')$patientRouter
+filesToList <- require.r('./transpose.R')$filesToList
+components <- require.r('./components.R')
 
 
 server <- function(input, output, session) {

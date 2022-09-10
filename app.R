@@ -6,12 +6,12 @@ library(purrr)
 library(commonr)
 library(rheroicons)
 library(marker)
-BASE_DIR <- "abstraction-app"
-require.r.config(basedir = "abstraction-app")
+#BASE_DIR <- "abstraction-app"
+#require.r.config(basedir = "abstraction-app")
 options(shiny.autoreload = TRUE, shiny.port=3300)
 print(getOption("shiny.autoreload"))
-server <- require.r('server.R')$server
-ui <- require.r('ui.R')$ui
+server <- require.r('./server.R')$server
+ui <- require.r('./ui.R')$ui
 
 
 # Create Shiny app ----
