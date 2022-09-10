@@ -114,6 +114,9 @@ input:checked + .slider:before {
 
 /* Rounded sliders */
 
+input:not(:checked) + .dropdown-content {
+    pointer-events: none;
+}
 
 input:checked + .dropdown-content, .dropdown-content:focus {
     @apply scale-100;
