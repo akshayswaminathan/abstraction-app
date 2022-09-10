@@ -83,7 +83,6 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
 
 
 exports$dropdownButton <- dropdownButton <- function(name, options, inputName, ...){
-  div(class="text-right ml-auto",
       div(class="relative inline-block text-left",
 
 
@@ -103,7 +102,7 @@ exports$dropdownButton <- dropdownButton <- function(name, options, inputName, .
               )
           )
       )
-  )
+
 }
 
 exports$switchInput <- switchInput <- function(...){
@@ -135,11 +134,12 @@ exports$txtInput <- txtInput <- function(...){
           tags$button(
              `data-tooltip`="Regular Expression",
              class="cursor-pointer hover:text-white tooltip",
+             id="regex-button",
              onclick="window.useRegex = !window.useRegex; Shiny.setInputValue('useRegex', window.useRegex); this.classList.toggle('text-primary', window.useRegex); this.classList.toggle('hover:text-white', !window.useRegex)",
              rheroicon("flag", "solid")
            ),
         ),
-            dropdownButton("Presets", list("apple", "banana", "cantaloupe"), 'patientSearchString', "document.getElementById('patient-search-input').value = this.innerText;"),
+            dropdownButton("Presets", list("apple", "banana", "considered"), 'patientSearchString', "ml-auto", "document.getElementById('patient-search-input').value = this.innerText;window.useRegex = !window.useRegex; Shiny.setInputValue('useRegex', window.useRegex); document.getElementById('regex-button').classList.toggle('text-primary', window.useRegex); document.getElementById('regex-button').classList.toggle('hover:text-white', !window.useRegex)"),
           tags$script("Shiny.setInputValue('patientSearchString', '');"),
 
       ),
