@@ -125,7 +125,7 @@ exports$txtInput <- txtInput <- function(...){
  searchSpace <- function(patient, chart.group){
   div(class="flex flex-col grow w-full lg:px-32 md:px-16 px-8 pt-8",
     div(class="rounded bg-grey-200  text-muted font-light flex flex-row",
-        div(class="py-2 px-3 gap-2 flex flex-row",
+        div(class="py-2 px-3 gap-2 flex flex-row grow",
           rheroicon("search", class = "w-5 h-5 my-auto"),
           tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal",
                      placeholder="Search charts...",
