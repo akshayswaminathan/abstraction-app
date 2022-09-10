@@ -84,6 +84,7 @@ chartTabs <- function(charts, selected.tab=NULL, patient){
 }
 
 
+
 exports$dropdownButton <- dropdownButton <- function(name, options, inputName, class, ...){
       div(class=paste("relative inline-block text-left", class),
 
@@ -104,6 +105,7 @@ exports$dropdownButton <- dropdownButton <- function(name, options, inputName, c
               )
           )
       )
+
 
 }
 
