@@ -115,7 +115,7 @@ server <- function(input, output, session) {
   
   variableSelector <- reactive({
     if (is.null(input$filterFileName)) {
-      tags$span("Select a file")
+      NULL
     } else {
       components$dropdownButton("Variables to filter", colnames(all_charts_df()[[input$filterFileName]]), "filterVariableName")
     }
@@ -125,7 +125,13 @@ server <- function(input, output, session) {
     if (is.null(input$filterFileName)) {
       tags$span("Select a file")
     } else {
-      textInput("filterCode", NULL, "")    }
+      textInput("filterCode", NULL, "",
+                width = '1000px')    }
+  })
+  
+  stringHighlightEntry <- reactive({
+    textInput("chartSearchString", NULL, "",
+              width = '800px')    
   })
 
   output$settingsBody <- renderUI({
@@ -141,7 +147,8 @@ server <- function(input, output, session) {
         ),
         
         div(class="flex flex-row px-28",
-            tags$button(class="ml-12 px-4 py-2 bg-primary rounded text-white", onclick="Shiny.setInputValue('dataLoadTrigger', (new Date).toUTCString()); console.log(`yo`)", "Update Data")),
+            tags$button(class="ml-12 px-4 py-2 bg-primary rounded text-white", 
+                        onclick="Shiny.setInputValue('dataLoadTrigger', (new Date).toUTCString()); console.log(`yo`)", "Update Data")),
         
         # Filtering area
         tags$form(class="flex flex-col pr-8 gap-2",
@@ -149,16 +156,13 @@ server <- function(input, output, session) {
                   filterCodeEntry(),
                   variableSelector(),
                   components$dropdownButton("File to filter", names(all_charts_df()), "filterFileName")
-                  # tags$input(onblur="Shiny.setInputValue('variableName', this.value);", class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", type="text", name="variableName", placeholder= names(all_charts_df()), value=input$variableName,
-                  #            tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", name="variableType", onchange=" Shiny.setInputValue('variableType', event.target.value);",
-                  #                          tags$legend(class="px-1", "Variable Type"),
-                  #                          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "boolean"){ "yes"} else NULL}, type="radio", id="boolean", value="boolean", tags$label("Boolean", `for`="boolean", class="grow my-auto"))),
-                  #                          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "number"){"yes"} else NULL}, type="radio", id="number", value="number", tags$label("Number", `for`="number", class="grow my-auto"))),
-                  #                          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "txt"){"yes"} else NULL}, type="radio", id="txt", value="txt", tags$label("Text", `for`="txt", class="grow my-auto")))
-                  #                          
-                  #            )
-                  # )
                   ),
+        
+        # String highlight area
+        tags$form(class="flex flex-col pr-8 gap-2",
+                  span(class="font-bold text-sidebarHeader mb-2", "String to highlight"),
+                  stringHighlightEntry()
+        ),
         
         div(class="flex flex-row w-full divide-x-2 divide-grey-200 p-5 rounded bg-white focus-within:shadow-lg transition transition-all",
             #div(class="px-28","omg file names"), # for renaming the files
@@ -174,7 +178,6 @@ server <- function(input, output, session) {
                 )
             )
         )
-        
     )
   })
   
@@ -285,6 +288,7 @@ server <- function(input, output, session) {
     )
   })
 
+  # counts the number of matches of a string
   output$chartMatches <- renderUI({
     chart <- Filter(function(x){x$Chart.ID == selectedChart()}, selectedPatient()$chartGroups[[selectedChartGroup()]])[[1]]
     if (is.null(input$chartSearchString)) { "No "} else matches <- str_count(chart$Text, input$chartSearchString)
@@ -292,7 +296,8 @@ server <- function(input, output, session) {
   })
 
   output$body <- renderUI({
-    components$patientView(selectedPatient(), selectedChartGroup(), selectedChart())
+    components$patientView(selectedPatient(), selectedChartGroup(), selectedChart(), input$chartSearchString,
+                           all_patients = patients())
   })
 
   chartSearchResults <- reactive({
