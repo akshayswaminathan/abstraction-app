@@ -108,10 +108,34 @@ exports$dropdownButton <- dropdownButton <- function(name, options, inputName, .
 }
 
 exports$switchInput <- switchInput <- function(...){
-  tags$label(class="switch",
-             tags$input(type="checkbox", ...),
-             span(class="slider round")
-  )
+  # tags$label(class="switch",
+  #            tags$input(type="checkbox", ...),
+  #            span(class="slider round")
+  # )
+  
+  tags$form(class="flex flex-col pr-8 gap-2",
+            # span(class="font-bold text-sidebarHeader mb-2", "Variable"),
+            # tags$input(
+              # onblur="Shiny.setInputValue('variableName', this.value);", 
+              # class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", 
+              # type="text", 
+              # name="variableName", 
+              # placeholder="Variable Name", 
+              # value=input$variableName,
+              # tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", 
+                            # name="variableType", 
+                            # onchange=" Shiny.setInputValue('variableType', event.target.value);",
+                            # tags$legend(class="px-1", "Variable Type"),
+                            div(class="flex flex-row gap-2", 
+                                tags$input(class="my-auto", checked= NULL, type="radio", id="yes", ..., 
+                                           tags$label("Yes", `for`="yes", class="grow my-auto"))),
+                            div(class="flex flex-row gap-2", 
+                                tags$input(class="my-auto", checked= NULL, type="radio", id="no", ..., 
+                                           tags$label("No", `for`="no", class="grow my-auto")))
+                            
+              # )
+            # )
+            )
   
   # tags$label(tags$input(id = "boolean", ...),
   #            span(class="slider round")
@@ -232,7 +256,7 @@ chartSearchView <- function(chart.group,
                             chart.group.name = NULL,
                             all_patients = NULL){
   #' @param chart.group a list of all the charts in that group
-
+  
   chart <- Filter(function(x){x$Chart.ID == chart.id}, chart.group)[[1]]
   chart_ids <- map_chr(chart.group, ~.x$Chart.ID)
   patient_ids <- map_chr(all_patients, ~.x$id)
@@ -256,7 +280,7 @@ chartSearchView <- function(chart.group,
   } else {
     previous_patient_id <- patient.id
   }
-
+  
   div(class="px-36 flex flex-col py-8 gap-2 grow h-full",
       # div(class="rounded bg-grey-200 py-2 px-3 gap-2 text-muted font-light flex flex-row mb-4",
       #         rheroicon("search", class = "w-5 h-5 my-auto"),
@@ -312,9 +336,9 @@ chartSearchView <- function(chart.group,
           
           a(class="flex",
             href = route_link(paste0("patient?patient_id=", next_patient_id, "&chart_group=", chart.group.name, "&chart_id=", next_chart_id)),
-              div(class="rounded-full p-2 bg-primary my-auto mx-auto text-white",
-                  rheroicon("chevron_right", "solid", class="h-8 w-8 stroke-2")
-              )
+            div(class="rounded-full p-2 bg-primary my-auto mx-auto text-white",
+                rheroicon("chevron_right", "solid", class="h-8 w-8 stroke-2")
+            )
           ),
           
           # a(class=paste("block p-[10px] rounded flex flex-row gap-[10px]", ifelse(selected, "bg-grey-200", "hover:bg-grey-200/50")), 
