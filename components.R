@@ -108,34 +108,34 @@ exports$dropdownButton <- dropdownButton <- function(name, options, inputName, .
 }
 
 exports$switchInput <- switchInput <- function(...){
-  # tags$label(class="switch",
-  #            tags$input(type="checkbox", ...),
-  #            span(class="slider round")
-  # )
+  tags$label(class="switch",
+             tags$input(type="checkbox", ...),
+             span(class="slider round")
+  )
   
-  tags$form(class="flex flex-col pr-8 gap-2",
-            # span(class="font-bold text-sidebarHeader mb-2", "Variable"),
-            # tags$input(
-              # onblur="Shiny.setInputValue('variableName', this.value);", 
-              # class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", 
-              # type="text", 
-              # name="variableName", 
-              # placeholder="Variable Name", 
-              # value=input$variableName,
-              # tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", 
-                            # name="variableType", 
-                            # onchange=" Shiny.setInputValue('variableType', event.target.value);",
-                            # tags$legend(class="px-1", "Variable Type"),
-                            div(class="flex flex-row gap-2", 
-                                tags$input(class="my-auto", checked= NULL, type="radio", id="yes", ..., 
-                                           tags$label("Yes", `for`="yes", class="grow my-auto"))),
-                            div(class="flex flex-row gap-2", 
-                                tags$input(class="my-auto", checked= NULL, type="radio", id="no", ..., 
-                                           tags$label("No", `for`="no", class="grow my-auto")))
-                            
-              # )
-            # )
-            )
+  # tags$form(class="flex flex-col pr-8 gap-2",
+  #           # span(class="font-bold text-sidebarHeader mb-2", "Variable"),
+  #           # tags$input(
+  #             # onblur="Shiny.setInputValue('variableName', this.value);", 
+  #             # class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", 
+  #             # type="text", 
+  #             # name="variableName", 
+  #             # placeholder="Variable Name", 
+  #             # value=input$variableName,
+  #             # tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", 
+  #                           # name="variableType", 
+  #                           # onchange=" Shiny.setInputValue('variableType', event.target.value);",
+  #                           # tags$legend(class="px-1", "Variable Type"),
+  #                           div(class="flex flex-row gap-2", 
+  #                               tags$input(class="my-auto", type="radio", ..., 
+  #                                          tags$label("Yes", `for`="yes", class="grow my-auto"))),
+  #                           div(class="flex flex-row gap-2", 
+  #                               tags$input(class="my-auto", type="radio", ..., 
+  #                                          tags$label("No", `for`="no", class="grow my-auto")))
+  #                           
+  #             # )
+  #           # )
+  #           )
   
   # tags$label(tags$input(id = "boolean", ...),
   #            span(class="slider round")

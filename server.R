@@ -195,7 +195,8 @@ server <- function(input, output, session) {
     div(class="flex flex-row justify-center gap-2 mt-4",
         span(class="font-medium mr-auto my-auto", recordingProperty()),
         switch(recordingType(),
-               boolean=components$switchInput(value = value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+               boolean=components$switchInput(checked= { if (isTruthy(value)){TRUE} else NULL }, oninput="Shiny.setInputValue('recordingData', this.value == 'on'); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+               # boolean=components$switchInput(value = value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
                number=components$numberInput(value=value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
                txt=components$txtInput(value=value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"))) })
 
