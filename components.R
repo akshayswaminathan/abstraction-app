@@ -21,12 +21,13 @@ exports$monogram <- monogram <- function(id){
 }
 
 exports$patientListItem <- patientListItem <- function(patient, selected = FALSE){
+
   a(class=paste("block p-[10px] rounded flex flex-row gap-[10px]", ifelse(selected, "bg-grey-200", "hover:bg-grey-200/50")), 
     href=route_link(paste0('patient?patient_id=',patient$id)),
     monogram(patient$id),
     div(class="flex flex-col gap-1 w-full",
         span(class="font-medium text-monogram",paste("Patient", patient$id)),
-        span(class="block text-muted break-words line-clamp-1 font-light text-mini leading-tight", paste(length(unlist(patient$chartGroups)), "charts"))
+        span(class="block text-muted break-words line-clamp-1 font-light text-mini leading-tight", paste(length(patient$chartGroups[[1]]), "charts"))
     ),
     rheroicon("chevron_right", "outline", class = 'w-6 h-6 my-auto shrink-0')
   )
@@ -298,7 +299,9 @@ chartSearchView <- function(chart.group,
           tags$input(class="w-full bg-transparent outline-none caret-primary font-medium text-black placeholder:text-muted placeholder:font-normal",
                      #placeholder="Search chart...",
                      value= highlight_string,
-                     onclick="window.markInstance && window.markInstance.unmark()[window.useRegex? 'markRegExp':'mark'](window.useRegex? new RegExp(this.value, 'i') : this.value)"),
+                     # onclick="window.markInstance"),
+                     onclick="window.markInstance && window.markInstance.unmark()[!window.useRegex? 'markRegExp':'mark'](!window.useRegex? new RegExp(this.value, 'i') : this.value)"),
+          
           tags$button(
             `data-tooltip`="Regular Expression",
             class="cursor-pointer hover:text-white tooltip",
