@@ -341,6 +341,7 @@ chartSearchView <- function(chart.group,
             href = route_link(paste0("patient?patient_id=", next_patient_id, "&chart_group=", chart.group.name, "&chart_id=", next_chart_id)),
             div(class="rounded-full p-2 bg-primary my-auto mx-auto text-white",
                 rheroicon("chevron_right", "solid", class="h-8 w-8 stroke-2")
+                
             )
           ),
           
