@@ -6,7 +6,9 @@ library(purrr)
 library(commonr)
 library(rheroicons)
 library(marker)
-options(shiny.autoreload = TRUE, shiny.port=3300)
+options(shiny.autoreload = TRUE, 
+        shiny.port=3300,
+        shiny.maxRequestSize = 50 * 1024^2)
 print(getOption("shiny.autoreload"))
 server <- require.r('./server.R')$server
 ui <- require.r('./ui.R')$ui

@@ -12,12 +12,12 @@ server <- function(input, output, session) {
   router$server(input, output, session)
   # patientRouter$server(input, output, session)
   recordingProperty <- reactive({
-     if(is.null(input$variableName)){ "my property" }
-     else {input$variableName}
+    if(is.null(input$variableName)){ "my property" }
+    else {input$variableName}
   })
   recordingType <- reactive({
     # boolean | number | txt
-
+    
     if (is.null(input$variableType)){ "boolean" }
     else { input$variableType }
   })
@@ -26,33 +26,33 @@ server <- function(input, output, session) {
     file <- input$file
     if (is.null(file) | is.null(input$dataLoadTrigger)) { 
       NULL 
-      } else {
-        
-        raw_data <- purrr::map2(file$datapath, file$name, 
-                    ~read.csv(.x) %>% 
-                      mutate(Category = .y)) %>% 
-          setNames(file$name)
-        
-        if (!is.null(input$filterFileName) & !is.null(input$filterCode)) {
-          raw_data <- raw_data[[input$filterFileName]] %>% 
-            filter(eval(parse(text = input$filterCode)))
-        }
-        
-        raw_data %>% 
-          bind_rows() %>% 
-          group_by(Patient.Id) %>% 
-          nest() %>% 
-          mutate(new_data = map(data, ~mutate(.x, Patient.Id = Patient.Id) %>% 
-                                  as.data.frame())) %>% 
-          pull(new_data, name = Patient.Id) %>% 
-          imap(~list(id = .y, 
-                     chartGroups = purrr::map(split(.x, .x$Category), function (chart.group){
-                       purrr::map(seq_len(nrow(chart.group)),
-                                  function(row){as.list(unlist(chart.group[row,]))}
-                       )
-                     })
-          ))
-        
+    } else {
+      
+      raw_data <- purrr::map2(file$datapath, file$name, 
+                              ~read.csv(.x) %>% 
+                                mutate(Category = .y)) %>% 
+        setNames(file$name)
+      
+      if (!is.null(input$filterFileName) & !is.null(input$filterCode)) {
+        raw_data <- raw_data[[input$filterFileName]] %>% 
+          filter(eval(parse(text = input$filterCode)))
+      }
+      
+      raw_data %>% 
+        bind_rows() %>% 
+        group_by(Patient.Id) %>% 
+        nest() %>% 
+        mutate(new_data = map(data, ~mutate(.x, Patient.Id = Patient.Id) %>% 
+                                as.data.frame())) %>% 
+        pull(new_data, name = Patient.Id) %>% 
+        imap(~list(id = .y, 
+                   chartGroups = purrr::map(split(.x, .x$Category), function (chart.group){
+                     purrr::map(seq_len(nrow(chart.group)),
+                                function(row){as.list(unlist(chart.group[row,]))}
+                     )
+                   })
+        ))
+      
     }
   }, ignoreNULL = F)
   
@@ -65,7 +65,7 @@ server <- function(input, output, session) {
     }
   }, ignoreNULL = F)
   
-
+  
   selectedPatient <- reactive({
     pIndex <- get_query_param('patient_id')
     if (is.null(pIndex)){
@@ -77,11 +77,11 @@ server <- function(input, output, session) {
     else {
       NULL
     }
-
+    
   })
   selectedChartGroup <- reactive({get_query_param('chart_group')});
   selectedChart <- reactive({get_query_param('chart_id')});
-
+  
   output$patientList <- renderUI({
     patient.list <- patients()
     if (is.null(patient.list)){
@@ -89,33 +89,33 @@ server <- function(input, output, session) {
     }
     else {
       div(class="flex flex-col",
-      components$patientsList(patient.list, selectedId = selectedPatient()$id)
+          components$patientsList(patient.list, selectedId = selectedPatient()$id)
       )
     }
   })
-
+  
   output$recordConfiguration <- renderUI({
-
+    
     
     # a little bit of a delay to make it user friendly
     tags$form(class="flex flex-col pr-8 gap-2",
-        span(class="font-bold text-sidebarHeader mb-2", "Variable"),
-        tags$input(onblur="Shiny.setInputValue('variableName', this.value);", class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", type="text", name="variableName", placeholder="Variable Name", value=input$variableName,
-        tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", name="variableType", onchange=" Shiny.setInputValue('variableType', event.target.value);",
-          tags$legend(class="px-1", "Variable Type"),
-          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "boolean"){ "yes"} else NULL}, type="radio", id="boolean", value="boolean", tags$label("Boolean", `for`="boolean", class="grow my-auto"))),
-          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "number"){"yes"} else NULL}, type="radio", id="number", value="number", tags$label("Number", `for`="number", class="grow my-auto"))),
-          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "txt"){"yes"} else NULL}, type="radio", id="txt", value="txt", tags$label("Text", `for`="txt", class="grow my-auto")))
-
-        )
-    ))
+              span(class="font-bold text-sidebarHeader mb-2", "Variable"),
+              tags$input(onblur="Shiny.setInputValue('variableName', this.value);", class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", type="text", name="variableName", placeholder="Variable Name", value=input$variableName,
+                         tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", name="variableType", onchange=" Shiny.setInputValue('variableType', event.target.value);",
+                                       tags$legend(class="px-1", "Variable Type"),
+                                       div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "boolean"){ "yes"} else NULL}, type="radio", id="boolean", value="boolean", tags$label("Boolean", `for`="boolean", class="grow my-auto"))),
+                                       div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "number"){"yes"} else NULL}, type="radio", id="number", value="number", tags$label("Number", `for`="number", class="grow my-auto"))),
+                                       div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "txt"){"yes"} else NULL}, type="radio", id="txt", value="txt", tags$label("Text", `for`="txt", class="grow my-auto")))
+                                       
+                         )
+              ))
     
   })
   
   
   variableSelector <- reactive({
     if (is.null(input$filterFileName)) {
-      tags$span("Select a file")
+      NULL
     } else {
       components$dropdownButton("Variables to filter", colnames(all_charts_df()[[input$filterFileName]]), "filterVariableName")
     }
@@ -125,9 +125,15 @@ server <- function(input, output, session) {
     if (is.null(input$filterFileName)) {
       tags$span("Select a file")
     } else {
-      textInput("filterCode", NULL, "")    }
+      textInput("filterCode", NULL, "",
+                width = '1000px')    }
   })
-
+  
+  stringHighlightEntry <- reactive({
+    textInput("chartSearchString", NULL, "",
+              width = '800px')    
+  })
+  
   output$settingsBody <- renderUI({
     div(class="flex flex-col w-full grow gap-4 px-24 pt-24",
         fileInput(
@@ -141,7 +147,8 @@ server <- function(input, output, session) {
         ),
         
         div(class="flex flex-row px-28",
-            tags$button(class="ml-12 px-4 py-2 bg-primary rounded text-white", onclick="Shiny.setInputValue('dataLoadTrigger', (new Date).toUTCString()); console.log(`yo`)", "Update Data")),
+            tags$button(class="ml-12 px-4 py-2 bg-primary rounded text-white", 
+                        onclick="Shiny.setInputValue('dataLoadTrigger', (new Date).toUTCString()); console.log(`yo`)", "Update Data")),
         
         # Filtering area
         tags$form(class="flex flex-col pr-8 gap-2",
@@ -149,16 +156,13 @@ server <- function(input, output, session) {
                   filterCodeEntry(),
                   variableSelector(),
                   components$dropdownButton("File to filter", names(all_charts_df()), "filterFileName")
-                  # tags$input(onblur="Shiny.setInputValue('variableName', this.value);", class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", type="text", name="variableName", placeholder= names(all_charts_df()), value=input$variableName,
-                  #            tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", name="variableType", onchange=" Shiny.setInputValue('variableType', event.target.value);",
-                  #                          tags$legend(class="px-1", "Variable Type"),
-                  #                          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "boolean"){ "yes"} else NULL}, type="radio", id="boolean", value="boolean", tags$label("Boolean", `for`="boolean", class="grow my-auto"))),
-                  #                          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "number"){"yes"} else NULL}, type="radio", id="number", value="number", tags$label("Number", `for`="number", class="grow my-auto"))),
-                  #                          div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "txt"){"yes"} else NULL}, type="radio", id="txt", value="txt", tags$label("Text", `for`="txt", class="grow my-auto")))
-                  #                          
-                  #            )
-                  # )
-                  ),
+        ),
+        
+        # String highlight area
+        tags$form(class="flex flex-col pr-8 gap-2",
+                  span(class="font-bold text-sidebarHeader mb-2", "String to highlight"),
+                  stringHighlightEntry()
+        ),
         
         div(class="flex flex-row w-full divide-x-2 divide-grey-200 p-5 rounded bg-white focus-within:shadow-lg transition transition-all",
             #div(class="px-28","omg file names"), # for renaming the files
@@ -174,7 +178,6 @@ server <- function(input, output, session) {
                 )
             )
         )
-        
     )
   })
   
@@ -192,10 +195,11 @@ server <- function(input, output, session) {
     div(class="flex flex-row justify-center gap-2 mt-4",
         span(class="font-medium mr-auto my-auto", recordingProperty()),
         switch(recordingType(),
-               boolean=components$switchInput(checked= { if (isTruthy(value)){TRUE} else NULL }, oninput="Shiny.setInputValue('recordingData', this.value === 'on'); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+               boolean=components$switchInput(checked= { if (isTruthy(value)){TRUE} else NULL }, oninput="Shiny.setInputValue('recordingData', this.value == 'on'); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+               # boolean=components$switchInput(value = value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
                number=components$numberInput(value=value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
                txt=components$txtInput(value=value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"))) })
-
+  
   flaggedCharts <- reactiveVal(list());
   observeEvent(input$flaggingTime, {
     the.data <- flaggedCharts();
@@ -205,17 +209,17 @@ server <- function(input, output, session) {
     )
     flaggedCharts(the.data)
   })
-
+  
   output$flagButton <- renderUI({
     value <- flaggedCharts()[[selectedChartGroup()]][[selectedChart()]][['data']]
     needUpdate <- { is.null(value) || input$flagReason != value }
     tags$button(class=paste({ if (needUpdate) "bg-[#FEA725]" else "bg-[#67D292]"}, "text-white flex flex-row px-3 py-2 ml-auto rounded mt-2 gap-2"),
-            onclick="Shiny.setInputValue('flaggingTime', (new Date).toUTCString());",
-            rheroicon(ifelse(needUpdate, "flag", "check_circle"), "solid", class="h-5 w-5 my-auto"),
-            span(class="my-auto", ifelse(needUpdate, "Flag", "Flagged"))
-        )
+                onclick="Shiny.setInputValue('flaggingTime', (new Date).toUTCString());",
+                rheroicon(ifelse(needUpdate, "flag", "check_circle"), "solid", class="h-5 w-5 my-auto"),
+                span(class="my-auto", ifelse(needUpdate, "Flag", "Flagged"))
+    )
   })
-
+  
   output$flagChartSidebar <- renderUI({
     value <- flaggedCharts()[[selectedChartGroup()]][[selectedChart()]][['data']]
     div(class="flex flex-col",
@@ -223,48 +227,48 @@ server <- function(input, output, session) {
         uiOutput('flagButton')
     )
   })
-
+  
   output$generatedData <- renderUI({
     # 1. obtain file data
-      file <- input$file #isolate({ input$file })
-      if (is.null(file)){
-        return(NULL)
-      }
-      record <- recordedData()
-      recordName <- recordingProperty()
-      recordType <- recordingType()
-      flag <- flaggedCharts()
-      files <- purrr::map(seq_len(nrow(as.matrix(file))), function(n) {
-        # a string and a data.frame
-        f <- list(name = file[n, 'name'], data = read.csv(file[n, 'datapath']))
-        defaultValue <- switch(recordType,
-          boolean=FALSE,
-          number=0,
-          txt="",
-          FALSE
-        )
-        f$data <- mutate(f$data, thing=defaultValue, thing_date="", flag=FALSE, flag_reason="", flag_date="")
-        if (!is.null(record[[f$name]])){
+    file <- input$file #isolate({ input$file })
+    if (is.null(file)){
+      return(NULL)
+    }
+    record <- recordedData()
+    recordName <- recordingProperty()
+    recordType <- recordingType()
+    flag <- flaggedCharts()
+    files <- purrr::map(seq_len(nrow(as.matrix(file))), function(n) {
+      # a string and a data.frame
+      f <- list(name = file[n, 'name'], data = read.csv(file[n, 'datapath']))
+      defaultValue <- switch(recordType,
+                             boolean=FALSE,
+                             number=0,
+                             txt="",
+                             FALSE
+      )
+      f$data <- mutate(f$data, thing=defaultValue, thing_date="", flag=FALSE, flag_reason="", flag_date="")
+      if (!is.null(record[[f$name]])){
         for (chart.id in names(record[[f$name]])){
           chart.data <- record[[f$name]][[chart.id]]
           f$data[f$data$Chart.ID==chart.id,][['thing']] <- chart.data$data
           f$data[f$data$Chart.ID==chart.id,][['thing_date']] <- chart.data$date
         }
-        }
-        if (!is.null(flag[[f$name]])){
+      }
+      if (!is.null(flag[[f$name]])){
         for (chart.id in names(flag[[f$name]])){
           chart.data <- flag[[f$name]][[chart.id]]
           f$data[f$data$Chart.ID==chart.id,][['flag']] <- TRUE
           f$data[f$data$Chart.ID==chart.id,][['flag_reason']] <- chart.data$data
           f$data[f$data$Chart.ID==chart.id,][['flag_date']] <- chart.data$date
         }
-        }
-        names(f$data)[names(f$data) == 'thing'] <- recordName
-        names(f$data)[names(f$data) == 'thing_date'] <- paste0(recordName, '_date')
-        # convert to csv string
-        f$data <- format_csv(f$data)
-        f
-      })
+      }
+      names(f$data)[names(f$data) == 'thing'] <- recordName
+      names(f$data)[names(f$data) == 'thing_date'] <- paste0(recordName, '_date')
+      # convert to csv string
+      f$data <- format_csv(f$data)
+      f
+    })
     downloadHandler(
       filename = function() {
         paste("output", "zip", sep=".")
@@ -284,32 +288,37 @@ server <- function(input, output, session) {
       outputArgs = list(class="w-full bg-grey-100 flex flex-row gap-3 px-4 py-3 rounded font-medium text-sidebar items-center")
     )
   })
-
+  
+  # counts the number of matches of a string
   output$chartMatches <- renderUI({
     chart <- Filter(function(x){x$Chart.ID == selectedChart()}, selectedPatient()$chartGroups[[selectedChartGroup()]])[[1]]
     if (is.null(input$chartSearchString)) { "No "} else matches <- str_count(chart$Text, input$chartSearchString)
     span(class="text-muted", paste(matches, "matches"))
   })
-
+  
   output$body <- renderUI({
-    components$patientView(selectedPatient(), selectedChartGroup(), selectedChart())
+    components$patientView(selectedPatient(), selectedChartGroup(), selectedChart(), input$chartSearchString,
+                           all_patients = patients())
   })
-
+  
   chartSearchResults <- reactive({
-    searchString <- if (is.null(input$patientSearchString)) "" else input$patientSearchString;
+    
     filterFunc <- function(charts, query){
       list.filter(
         charts,
-        tryCatch({ grepl(regex(query, ignore_case = T), Text, fixed = !input$useRegex) },
-                 error= function(cond){ grepl(regex(query, ignore_case = T), Text, fixed = TRUE) },
-                 warning= function(cond){ grepl(regex(query, ignore_case = T), Text, fixed = TRUE) }
+        tryCatch({grepl(query, Text, ignore.case = T)}, #grepl(regex(query, ignore_case = T), Text, fixed = !input$useRegex) },
+                 error = function(e) {grepl(query, Text, ignore.case = T)},
+                 warning = function(e) {grepl(query, Text, ignore.case = T)}
+                 # error= function(cond){ grepl(regex(query, ignore_case = T), Text, fixed = TRUE) },
+                 # warning= function(cond){ grepl(regex(query, ignore_case = T), Text, fixed = TRUE) }
         )
       )
     }
 
-    chart.group <- selectedChartGroup();
-    patient <- selectedPatient();
-
+    searchString <- if (is.null(input$patientSearchString)) "" else input$patientSearchString
+    chart.group <- selectedChartGroup()
+    patient <- selectedPatient()
+    
     if (is.null(chart.group)){
       # ALL tab
       # note that the output format is different for the ALL tab
@@ -327,11 +336,11 @@ server <- function(input, output, session) {
         filterFunc(charts, searchString)
       }
     }
-
-
-
+    
+    
+    
   })
-
+  
   output$searchSpaceRender <- renderUI({
     chart.group <- selectedChartGroup();
     res <- chartSearchResults()
@@ -344,14 +353,14 @@ server <- function(input, output, session) {
       components$searchSpace(selectedPatient(), res, all=is.null(chart.group))
     }
   })
-
-
+  
+  
   # a list of dataframes ready for export
-
-
+  
+  
   NULL
-
-
+  
+  
 }
 
 exports$server <- server
