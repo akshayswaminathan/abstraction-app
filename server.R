@@ -95,22 +95,94 @@ server <- function(input, output, session) {
   })
   
   output$recordConfiguration <- renderUI({
-    
-    
+
+
     # a little bit of a delay to make it user friendly
     tags$form(class="flex flex-col pr-8 gap-2",
               span(class="font-bold text-sidebarHeader mb-2", "Variable"),
               tags$input(onblur="Shiny.setInputValue('variableName', this.value);", class="rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none", type="text", name="variableName", placeholder="Variable Name", value=input$variableName,
                          tags$fieldset(class="flex flex-col border border-solid border-grey-200 p-3", name="variableType", onchange=" Shiny.setInputValue('variableType', event.target.value);",
                                        tags$legend(class="px-1", "Variable Type"),
-                                       div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "boolean"){ "yes"} else NULL}, type="radio", id="boolean", value="boolean", tags$label("Boolean", `for`="boolean", class="grow my-auto"))),
-                                       div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "number"){"yes"} else NULL}, type="radio", id="number", value="number", tags$label("Number", `for`="number", class="grow my-auto"))),
-                                       div(class="flex flex-row gap-2", tags$input(class="my-auto", name="variableType", checked={if(recordingType() == "txt"){"yes"} else NULL}, type="radio", id="txt", value="txt", tags$label("Text", `for`="txt", class="grow my-auto")))
-                                       
+                                       div(class="flex flex-row gap-2",
+                                           tags$input(class="my-auto",
+                                                      name="variableType",
+                                                      checked={if(recordingType() == "boolean"){ "yes"} else NULL},
+                                                      type="radio", id="boolean", value="boolean",
+                                                      tags$label("Boolean",
+                                                                 `for`="boolean", class="grow my-auto"))),
+                                       div(class="flex flex-row gap-2", 
+                                           tags$input(class="my-auto", 
+                                                      name="variableType", 
+                                                      checked={if(recordingType() == "number"){"yes"} else NULL}, 
+                                                      type="radio", id="number", value="number", 
+                                                      tags$label("Number", `for`="number", class="grow my-auto"))),
+                                       div(class="flex flex-row gap-2", 
+                                           tags$input(class="my-auto", 
+                                                      name="variableType", 
+                                                      checked={if(recordingType() == "txt"){"yes"} else NULL}, 
+                                                      type="radio", id="txt", value="txt", 
+                                                      tags$label("Text", `for`="txt", class="grow my-auto")))
+
                          )
               ))
-    
+
   })
+  
+  # output$recordConfiguration <- renderUI({
+  #   
+  #   # a little bit of a delay to make it user friendly
+  #   tags$form(class = "flex flex-col pr-8 gap-2",
+  #             span(class = "font-bold text-sidebarHeader mb-2", "Variable"),
+  #             tags$input(
+  #               onblur = "Shiny.setInputValue('variableName', this.value);",
+  #               class = "rounded bg-grey-200 px-3 py-2 focus:outline-none ring-0 border-0 outline-none",
+  #               type = "text",
+  #               name = "variableName",
+  #               placeholder = "Variable Name",
+  #               value = input$variableName
+  #             ),
+  #             tags$fieldset(
+  #               class = "flex flex-col border border-solid border-grey-200 p-3",
+  #               name = "variableType",
+  #               onchange = "Shiny.setInputValue('variableType', event.target.value);",
+  #               tags$legend(class = "px-1", "Variable Type"),
+  #               div(
+  #                 class = "flex flex-row gap-2",
+  #                 selectInput(
+  #                   inputId = "variableType",
+  #                   label = "Boolean",
+  #                   choices = c("NA", "TRUE", "FALSE"),
+  #                   selected = if (recordingType() == "boolean") "yes" else NULL
+  #                 )
+  #               ),
+  #               div(
+  #                 class = "flex flex-row gap-2",
+  #                 tags$input(
+  #                   class = "my-auto",
+  #                   name = "variableType",
+  #                   checked = if (recordingType() == "number") "TRUE" else NULL,
+  #                   type = "radio",
+  #                   id = "number",
+  #                   value = "number",
+  #                   tags$label("Number", `for` = "number", class = "grow my-auto")
+  #                 )
+  #               ),
+  #               div(
+  #                 class = "flex flex-row gap-2",
+  #                 tags$input(
+  #                   class = "my-auto",
+  #                   name = "variableType",
+  #                   checked = if (recordingType() == "txt") "yes" else NULL,
+  #                   type = "radio",
+  #                   id = "txt",
+  #                   value = "txt",
+  #                   tags$label("Text", `for` = "txt", class = "grow my-auto")
+  #                 )
+  #               )
+  #             )
+  #   )
+  #   
+  # })
   
   
   variableSelector <- reactive({
@@ -192,13 +264,22 @@ server <- function(input, output, session) {
   })
   output$recordDataSidebar <- renderUI({
     value <- isolate({ recordedData()})[[selectedChartGroup()]][[selectedChart()]][['data']]
+    if (length(value) == 0) {
+      value <- NA
+    }
     div(class="flex flex-row justify-center gap-2 mt-4",
         span(class="font-medium mr-auto my-auto", recordingProperty()),
         switch(recordingType(),
-               boolean=components$switchInput(checked= { if (isTruthy(value)){TRUE} else NULL }, oninput="Shiny.setInputValue('recordingData', this.value == 'on'); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
-               # boolean=components$switchInput(value = value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
-               number=components$numberInput(value=value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
-               txt=components$txtInput(value=value, oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"))) })
+               # boolean = components$switchInput(checked= { if (isTruthy(value)){TRUE} else NULL }, 
+               #                                oninput="Shiny.setInputValue('recordingData', this.value == 'on'); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+               boolean = components$switchInput(checked = coalesce(value, "NA"), 
+                                                oninput="if (this.checked) {Shiny.setInputValue('recordingData', TRUE);} else if (this.value === 'NA') {Shiny.setInputValue('recordingData', NA);} else {Shiny.setInputValue('recordingData', NULL);} Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+                                                # oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+               number = components$numberInput(value = value, 
+                                             oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())"),
+               txt = components$txtInput(value = value, 
+                                       oninput="Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString())")
+               )) })
   
   flaggedCharts <- reactiveVal(list());
   observeEvent(input$flaggingTime, {
@@ -242,7 +323,7 @@ server <- function(input, output, session) {
       # a string and a data.frame
       f <- list(name = file[n, 'name'], data = read.csv(file[n, 'datapath']))
       defaultValue <- switch(recordType,
-                             boolean=FALSE,
+                             boolean=NA,
                              number=0,
                              txt="",
                              FALSE

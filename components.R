@@ -144,6 +144,27 @@ exports$switchInput <- switchInput <- function(...){
   
 }
 
+# from GPT
+exports$switchInput <- function(checked = NULL, oninput=NULL, ...){
+  if (length(checked) == 0) {
+    checked <- NA
+  }
+  tags$div(class="multiple-choice",
+           tags$input(type="radio", value="TRUE", name="boolean", 
+                      checked=ifelse(checked=="TRUE", "checked", NA), 
+                      oninput=paste0("Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString());", oninput)),
+           tags$label(class="mr-2", "TRUE"),
+           tags$input(type="radio", value="FALSE", name="boolean", 
+                      checked=ifelse(checked=="FALSE", "checked", NA), 
+                      oninput=paste0("Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString());", oninput)),
+           tags$label(class="mr-2", "FALSE"),
+           tags$input(type="radio", value="NA", name="boolean", 
+                      checked=ifelse(is.na(checked), "checked", NA), 
+                      oninput=paste0("Shiny.setInputValue('recordingData', NA); Shiny.setInputValue('recordingTime', (new Date).toUTCString());", oninput)),
+           tags$label(class="mr-2", "NA")
+  )
+}
+
 exports$numberInput <- numberInput <- function(...){
   tags$input(type="number", ..., class="bg-grey-200 rounded px-2 py-1 w-20 text-center outline-none ring-0 focus:outline-none border-0")
   
@@ -184,7 +205,7 @@ exports$searchSpace <- function(patient, chart.group.results, all=FALSE){
       href=route_link(paste0("patient?patient_id=", patient$id, "&chart_group=", chart$Category, "&chart_id=", chart$Chart.ID)),
       div(class="w-20 h-24 shadow bg-white rounded shrink-0 my-auto"),
       div(class="flex flex-col",
-          span(class="font-medium text-sidebarHeader", chart$Title), span(class="line-clamp-3 text-muted font-light", chart$Text))
+          span(class="font-medium text-sidebarHeader", chart$Title), span(class="line-clamp-3 text-muted font-light", HTML(chart$Text)))
     )
   }
   # IN THE EVENT OF [ALL] TAB
@@ -309,7 +330,7 @@ chartSearchView <- function(chart.group,
             rheroicon("flag", "solid")
           )
       ),
-      div(id="mark-target",class="rounded px-6 py-4 bg-white grow overflow-y-auto", chart$Text),
+      div(id="mark-target",class="rounded px-6 py-4 bg-white grow overflow-y-auto", HTML(chart$Text)),
       tags$script("window.markInstance = new Mark('#mark-target');"),
       div(class="flex flex-row",
           
@@ -328,7 +349,7 @@ chartSearchView <- function(chart.group,
           
           div(class="grow flex flex-col pt-4 pb-2 gap-3 text-center",
               span(class="font-medium", paste0(chart$Title)),
-              span(class="text-muted","5 matches")
+              span(class="text-muted","     ")
               # uiOutput('chartMatches')
           ),
           # div(class="flex",
