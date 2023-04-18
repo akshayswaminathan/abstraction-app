@@ -149,3 +149,17 @@ label.input-group-btn.input-group-prepend {
     @apply outline-none ring-0 border-0;
 }
 
+
+label {
+  display: inline-block; /* wrap the label around the radio button */
+  margin-right: 10px; /* add space to the right of the button */
+  vertical-align: middle; /* align the label with the surrounding text */
+}
+
+input[type='radio'] {
+  transform: scale(2);
+  margin-right: 10px; /* add space to the right of the button */
+  margin: 10px 10px 10px 0;
+  display: inline-block; /* align the radio button vertically within the label */
+  vertical-align: middle; /* align the radio button with the surrounding text */
+}

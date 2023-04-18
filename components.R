@@ -144,24 +144,24 @@ exports$switchInput <- switchInput <- function(...){
   
 }
 
-# from GPT
-exports$switchInput <- function(checked = NULL, oninput=NULL, ...){
-  if (length(checked) == 0) {
-    checked <- NA
-  }
+# this is the one that works
+exports$switchInput <- function(checked = NULL){
+   if (is.null(checked)) {
+     checked_t <- checked_f <- checked
+   } else if (checked == "FALSE") {
+    checked_t <- NULL
+    checked_f <- "checked"
+  } else if (checked == "TRUE") {
+    checked_t <- "checked"
+    checked_f <- NULL
+  } 
   tags$div(class="multiple-choice",
-           tags$input(type="radio", value="TRUE", name="boolean", 
-                      checked=ifelse(checked=="TRUE", "checked", NA), 
-                      oninput=paste0("Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString());", oninput)),
-           tags$label(class="mr-2", "TRUE"),
-           tags$input(type="radio", value="FALSE", name="boolean", 
-                      checked=ifelse(checked=="FALSE", "checked", NA), 
-                      oninput=paste0("Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString());", oninput)),
+           tags$input(type="radio", value="FALSE", name="boolean", checked = checked_f, 
+                      oninput=paste0("Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString());")),
            tags$label(class="mr-2", "FALSE"),
-           tags$input(type="radio", value="NA", name="boolean", 
-                      checked=ifelse(is.na(checked), "checked", NA), 
-                      oninput=paste0("Shiny.setInputValue('recordingData', NA); Shiny.setInputValue('recordingTime', (new Date).toUTCString());", oninput)),
-           tags$label(class="mr-2", "NA")
+           tags$input(type="radio", value="TRUE", name="boolean", checked = checked_t,
+                      oninput=paste0("Shiny.setInputValue('recordingData', this.value); Shiny.setInputValue('recordingTime', (new Date).toUTCString());")),
+           tags$label(class="mr-2", "TRUE")
   )
 }
 
